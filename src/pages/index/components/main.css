@@ -1,0 +1,18 @@
+
+	.scale-page {
+		transform: scale(.75) translate(400rpx);
+		border-radius: 32rpx;
+		box-shadow: 0 0 16rpx rgba(0, 0, 0, .2);
+	}
+
+	.scale-page-minor {
+		transform: scale(.65) translate(200rpx);
+		border-radius: 32rpx;
+	}
+
+	.hide-page {
+		transform: scale(.6) translate(300rpx);
+		border-radius: 32rpx;
+		opacity: 0;
+		z-index: 30;
+	}

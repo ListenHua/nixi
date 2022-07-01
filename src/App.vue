@@ -1,7 +1,10 @@
 <script>
 	export default {
+		globalData:{
+			systemInfo:''
+		},
 		onLaunch: function() {
-			console.log('App Launch')
+			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
 		},
 		onShow: function() {
 			console.log('App Show')
@@ -12,6 +15,7 @@
 	}
 </script>
 
-<style>
-	/*每个页面公共css */
+<style lang="scss">
+	@import "uview-ui/index.scss";
+	@import "@/static/scss/index.scss";
 </style>
