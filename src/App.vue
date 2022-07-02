@@ -1,10 +1,25 @@
 <script>
 	export default {
-		globalData:{
-			systemInfo:''
+		globalData: {
+			systemInfo: ''
 		},
 		onLaunch: function() {
 			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
+			uni.login({
+				success: (res) => {
+					uniCloud.callFunction({
+						name: 'user',
+						data: {
+							action: "authUserInfo",
+							params:{
+								code:res.code
+							}
+						}
+					}).then(res => {
+						console.log(res);
+					})
+				}
+			})
 		},
 		onShow: function() {
 			console.log('App Show')

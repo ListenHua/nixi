@@ -10,7 +10,21 @@ exports.main = async (event, context) => {
 			return
 		}
 	}
-};
-authUserInfo(){
-	
-},
+}
+
+async function authUserInfo(event) {
+	const {
+		code,
+		avatarUrl,
+		gender,
+		nickName
+	} = event
+	const URL =
+		`https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${secret}&js_code=${code}&grant_type=authorization_code`
+	const requestOptions = {
+		method: 'GET',
+		dataType: 'json'
+	}
+	const res = await uniCloud.httpclient.request(URL, requestOptions)
+	return res
+}
