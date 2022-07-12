@@ -61,6 +61,7 @@
 			},
 		},
 		mounted() {
+			console.log("加载record")
 			this.checkPage()
 		},
 		methods: {
@@ -93,15 +94,6 @@
 <style scoped lang="scss">
 	@import url('main.css');
 	.view-content {
-		width: 100%;
-		position: absolute;
-		left: 0;
-		top: 0;
-		background-color: $color-white;
-		transition: all .5s;
-		box-sizing: border-box;
-		// padding-left: 60rpx;
-		overflow: scroll;
 
 		.block {
 			width: 90%;

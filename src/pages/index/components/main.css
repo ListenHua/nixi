@@ -1,4 +1,17 @@
 
+	.view-content {
+		width: 100%;
+		position: absolute;
+		left: 0;
+		top: 0;
+		background-color: #fff;
+		transition: all .5s;
+		box-sizing: border-box;
+		overflow: scroll;
+	}
+	.page-content{
+		padding-bottom: 50rpx;
+	}
 	.scale-page {
 		transform: scale(.75) translate(400rpx);
 		border-radius: 32rpx;

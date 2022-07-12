@@ -5,21 +5,6 @@
 		},
 		onLaunch: function() {
 			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
-			uni.login({
-				success: (res) => {
-					uniCloud.callFunction({
-						name: 'user',
-						data: {
-							action: "authUserInfo",
-							params:{
-								code:res.code
-							}
-						}
-					}).then(res => {
-						console.log(res);
-					})
-				}
-			})
 		},
 		onShow: function() {
 			console.log('App Show')
@@ -33,4 +18,69 @@
 <style lang="scss">
 	@import "uview-ui/index.scss";
 	@import "@/static/scss/index.scss";
+	
+	
+	/* table 样式 */
+	.table {
+		border-top: 1px solid #ccc;
+		border-left: 1px solid #ccc;
+	}
+
+	.table .td,
+	.table .th {
+		border-bottom: 1px solid #ccc;
+		border-right: 1px solid #ccc;
+		padding: 3px 5px;
+	}
+
+	.table .th {
+		border-bottom: 2px solid #ccc;
+		text-align: center;
+	}
+
+	/* blockquote 样式 */
+	.blockquote {
+		display: block;
+		border-left: 8px solid #d0e5f2;
+		padding: 5px 10px;
+		margin: 10px 0;
+		line-height: 1.4;
+		font-size: 100%;
+		background-color: #f1f1f1;
+	}
+
+	/* code 样式 */
+	.code {
+		display: block;
+		background-color: #f1f1f1;
+		border-radius: 6rpx;
+		padding: 20rpx;
+		margin: 6rpx 0;
+		white-space: pre;
+		overflow: scroll;
+	}
+
+	.pre .code {
+		display: block;
+	}
+
+	/* ul ol 样式 */
+	.ul,
+	.ol {
+		margin: 10px 0 10px 20px;
+	}
+	.li{
+		position: relative;
+		&::after{
+			position: absolute;
+			content: "";
+			width: 14rpx;
+			height: 14rpx;
+			border-radius: 50%;
+			// background-image: linear-gradient(to bottom,$color-main,$color-second);
+			left: -30rpx;
+			top: 14rpx;
+			animation: bgcolor 2s linear infinite alternate both;
+		}
+	}
 </style>

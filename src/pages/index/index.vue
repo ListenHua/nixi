@@ -12,9 +12,11 @@
 				@click="switchFuc(item.value)">{{item.title}}
 			</view>
 		</view>
-		<Setting :menuShow="menuShow" :page="pageParams" @switch="switchPage" @changeBg="changeBackground"></Setting>
 		<Record ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Record>
 		<Recommend :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Recommend>
+		<Interview :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Interview>
+		<Main :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Main>
+		<Setting :menuShow="menuShow" :page="pageParams" @switch="switchPage" @changeBg="changeBackground"></Setting>
 	</view>
 </template>
 
@@ -22,11 +24,15 @@
 	import Recommend from './components/recommend.vue'
 	import Setting from './components/setting.vue'
 	import Record from './components/record.vue'
+	import Interview from './components/interview.vue'
+	import Main from './components/main.vue'
 	export default {
 		components: {
 			Recommend,
+			Record,
+			Interview,
+			Main,
 			Setting,
-			Record
 		},
 		data() {
 			return {
@@ -42,14 +48,14 @@
 						title: "首页",
 						value: "index"
 					},
-					// {
-					// 	title: "资料库",
-					// 	value: ""
-					// },
-					// {
-					// 	title: "面试题",
-					// 	value: ""
-					// },
+					{
+						title: "资料库",
+						value: "database"
+					},
+					{
+						title: "面试题",
+						value: "interview"
+					},
 					{
 						title: "浏览记录",
 						value: "record"
@@ -92,6 +98,7 @@
 					this.pageParams = obj
 				}
 				this.menuShow = false
+				console.log("params",this.pageParams)
 			},
 			// 菜单栏操作
 			switchFuc(val) {
@@ -115,7 +122,6 @@
 		background-size: cover;
 		background-clip: content-box;
 		background-repeat: no-repeat;
-
 		.no-shadow {
 			box-shadow: none !important;
 		}
@@ -128,7 +134,7 @@
 			background-color: rgba(255, 255, 255, 0.1);
 			backdrop-filter: blur(10px);
 			border-radius: 50%;
-			box-shadow: 8rpx 8rpx 12rpx rgba(0, 0, 0, 0.16);
+			box-shadow: 8rpx 8rpx 12rpx rgba(0, 0, 0, 0.08);
 			z-index: 99;
 			display: flex;
 			flex-direction: column;
@@ -143,7 +149,7 @@
 				border-radius: 8px;
 				background-color: $text-color-main;
 				transition: all .5s;
-				box-shadow: 8rpx 8rpx 12rpx rgba(255, 255, 255, 0.16);
+				box-shadow: 8rpx 8rpx 12rpx rgba(255, 255, 255, 0.08);
 			}
 
 			.show {
@@ -174,7 +180,6 @@
 				position: absolute;
 				top: 0;
 				white-space: nowrap;
-				text-shadow: 0 0 24rpx $text-color-main;
 				transition: all .5s;
 				opacity: 0;
 			}

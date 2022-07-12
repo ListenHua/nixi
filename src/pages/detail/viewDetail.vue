@@ -38,7 +38,7 @@
 </template>
 
 <script>
-	import nParse from '@/components/feng-parse/parse.vue'
+	import nParse from '@/components/n-parse/parse.vue'
 	var timer;
 	export default {
 		components:{
