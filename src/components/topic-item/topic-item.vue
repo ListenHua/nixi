@@ -2,6 +2,7 @@
 	<view class="interview-block" :class="item.wrong?'shake-horizontal':''">
 		<view class="interview-block__info">
 			<text class="interview-block__info__type">「{{item.type===0?'多选':item.type===1?'单选':'问答题'}}」</text>
+			<text class="interview-block__info__tag" :style="{'background-color':item.level===0?'#7bcfa6':item.level===1?'#86a8e7':'#7f7fd5'}">{{item.level===0?'初级':item.level===1?'中级':'高级'}}</text>
 			<view class="interview-block__info__tag" v-for="(item,index) in tagList">{{item}}</view>
 		</view>
 		<view class="interview-block__title">
@@ -101,7 +102,7 @@
 			&__tag {
 				padding: 8rpx 16rpx;
 				border-radius: 8rpx;
-				background-color: rgba(127, 127, 213, 0.8);
+				background-color: rgba(127, 127, 213, 0.5);
 				margin-left: 10rpx;
 				margin-bottom: 10rpx;
 				font-size: 24rpx;

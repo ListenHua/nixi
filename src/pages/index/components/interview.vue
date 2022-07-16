@@ -2,11 +2,23 @@
 	<view :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
+		<view class="filter-bar" :style="{'padding-top':systemInfo.statusBarHeight+'px'}">
+			<view class="filter-bar__icon" @click="filterShow=true">
+				<image src="/static/images/filter-icon.svg"></image>
+			</view>
+		</view>
 		<view class="interview-list">
-			<topic-item v-for="(item,index) in interviewList" :item='item' :index="index" @show="showAnswer" @select="selectAnswer"></topic-item>
+			<topic-item v-for="(item,index) in interviewList" :item='item' :index="index" @show="showAnswer"
+				@select="selectAnswer"></topic-item>
 		</view>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
+		<!-- 筛选弹窗 -->
+		<u-popup :show="filterShow" @close="closeFilter" mode="top">
+			<view>
+				<text>出淤泥而不染，濯清涟而不妖</text>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -35,6 +47,7 @@
 		},
 		data() {
 			return {
+				filterShow: false,
 				zIndex: 30,
 				className: '',
 				systemInfo: getApp().globalData.systemInfo,
@@ -43,7 +56,7 @@
 		},
 		watch: {
 			menuShow(result) {
-				if(this.page.main=='interview'&&this.interviewList.length==0){
+				if (this.page.main == 'interview' && this.interviewList.length == 0) {
 					this.getData()
 				}
 				this.checkPage()
@@ -54,6 +67,10 @@
 			this.checkPage()
 		},
 		methods: {
+			// 关闭筛选弹窗
+			closeFilter(){
+				this.filterShow = false
+			},
 			// 显示答案
 			showAnswer(index) {
 				let data = this.interviewList[index]
@@ -124,10 +141,35 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
-	@import url('@/static/scss/animate.scss');
+	// @import url('@/static/scss/animate.scss');
 
 	.interview-list {
 		padding: 0 40rpx;
 	}
 
+	.filter-bar {
+		position: fixed;
+		width: 100%;
+		height: 48px;
+		background-color: #fff;
+		top: 0;
+		left: 0;
+		z-index: 99;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&__icon {
+			width: 60rpx;
+			height: 60rpx;
+			border: 4rpx solid #000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			image{
+				width: 36rpx;
+				height: 36rpx;
+			}
+		}
+	}
 </style>
