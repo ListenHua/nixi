@@ -15,8 +15,11 @@
 		<u-toast ref="uToast" />
 		<!-- 筛选弹窗 -->
 		<u-popup :show="filterShow" @close="closeFilter" mode="top">
-			<view>
-				<text>出淤泥而不染，濯清涟而不妖</text>
+			<view class="filter-pop">
+				<picker mode="selector" :range="levelOption" @change="changeLevel">
+					<view class="filter-level">{{levelText}}</view>
+				</picker>
+				<!-- <input v-model="label" type="text" @confirm="searchResult"> -->
 			</view>
 		</u-popup>
 	</view>
@@ -52,6 +55,8 @@
 				className: '',
 				systemInfo: getApp().globalData.systemInfo,
 				interviewList: [],
+				levelText: "初级",
+				levelOption: ["初级", "中级", "高级"]
 			}
 		},
 		watch: {
@@ -67,8 +72,12 @@
 			this.checkPage()
 		},
 		methods: {
+			// 选择等级
+			changeLevel(e) {
+				console.log(e);
+			},
 			// 关闭筛选弹窗
-			closeFilter(){
+			closeFilter() {
 				this.filterShow = false
 			},
 			// 显示答案
@@ -141,7 +150,27 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
+
 	// @import url('@/static/scss/animate.scss');
+	.filter-pop {
+		width: 100%;
+		height: 400rpx;
+		position: relative;
+
+		.filter-level {
+			position: absolute;
+			bottom: 100rpx;
+			left: 60rpx;
+			width: 168rpx;
+			height: 60rpx;
+			text-align: center;
+			line-height: 60rpx;
+			border-radius: 16rpx;
+			background-color: $color-main;
+			color: #fff;
+			font-size: 28rpx;
+		}
+	}
 
 	.interview-list {
 		padding: 0 40rpx;
@@ -158,17 +187,19 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+
 		&__icon {
-			width: 60rpx;
-			height: 60rpx;
+			width: 48rpx;
+			height: 48rpx;
 			border: 4rpx solid #000;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			border-radius: 50%;
-			image{
-				width: 36rpx;
-				height: 36rpx;
+
+			image {
+				width: 30rpx;
+				height: 30rpx;
 			}
 		}
 	}
