@@ -1,5 +1,5 @@
 <template>
-	<view :class="['view-content',className]"
+	<scroll-view scroll-y :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
 		<view class="cell-group">
@@ -17,32 +17,17 @@
 		</view>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
-	</view>
+	</scroll-view>
 </template>
 
 <script>
+	import mixin from './mixins.js'
 	export default {
 		name: "setting",
-		props: {
-			menuShow: {
-				type: Boolean,
-				default: false,
-			},
-			page: {
-				type: Object,
-				default: () => {
-					main: '';
-					minor: ''
-				}
-			}
-		},
+		mixins: [mixin],
 		data() {
 			return {
-				zIndex: 30,
-				className: '',
-				recommendList: [],
-				systemInfo: getApp().globalData.systemInfo,
-				isMainPage: false,
+
 			}
 		},
 		watch: {
@@ -60,16 +45,6 @@
 				uni.navigateTo({
 					url
 				})
-			},
-			// 
-			checkPage() {
-				let params = this.$handle.className(this.menuShow, this.page, 'setting')
-				this.className = params.class
-				this.zIndex = params.zIndex
-				console.log(params)
-			},
-			switchInPage() {
-				this.$emit("switch", 'setting')
 			},
 			// 清除阅读习惯
 			clearReadHabit() {

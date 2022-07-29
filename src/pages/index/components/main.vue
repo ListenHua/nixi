@@ -50,31 +50,15 @@
 		request
 	} from '@/utils/request.js'
 	import topicItem from '@/components/topic-item/topic-item'
+	import mixin from './mixins.js'
 	export default {
 		components: {
 			topicItem
 		},
 		name: "main",
-		props: {
-			menuShow: {
-				type: Boolean,
-				default: false,
-			},
-			page: {
-				type: Object,
-				default: () => {
-					main: '';
-					minor: ''
-				}
-			}
-		},
+		mixins:[mixin],
 		data() {
 			return {
-				zIndex: 30,
-				className: '',
-				recommendList: [],
-				systemInfo: getApp().globalData.systemInfo,
-				isMainPage: false,
 				userInfo: {},
 				isLogin: false,
 				bookList: [],
@@ -104,7 +88,7 @@
 						data.option.forEach(item => {
 							if (item.check != item.right) {
 								this.topicData.wrong = true
-								uni.vibrateShort()
+								uni.vibrateLong()
 							}
 						})
 					}
@@ -185,15 +169,6 @@
 						this.topicData = list[0]
 					}
 				})
-			},
-			// 页面方法
-			checkPage() {
-				let params = this.$handle.className(this.menuShow, this.page, 'index')
-				this.className = params.class
-				this.zIndex = params.zIndex
-			},
-			switchInPage() {
-				this.$emit("switch", 'index')
 			},
 		}
 	}

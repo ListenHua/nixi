@@ -1,6 +1,7 @@
 <template>
-	<view :class="['view-content',className]"
-		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
+	<scroll-view scroll-y :class="['view-content',className]"
+		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}"
+		@scrolltolower="loadingData">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
 		<view class="filter-bar" :style="{'padding-top':systemInfo.statusBarHeight+'px'}">
 			<view class="filter-bar__icon" @click="filterShow=true">
@@ -8,21 +9,30 @@
 			</view>
 		</view>
 		<view class="interview-list">
-			<topic-item v-for="(item,index) in interviewList" :item='item' :index="index" @show="showAnswer"
-				@select="selectAnswer"></topic-item>
+			<view class="interview-list__block" v-for="(item,index) in interviewList" :key="index">
+				<topic-item :item='item' :index="index" @show="showAnswer" @select="selectAnswer"></topic-item>
+			</view>
 		</view>
+		<u-divider v-if="nodata" text="已经到底了" :customStyle="{padding:'40rpx 60rpx'}"></u-divider>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
 		<!-- 筛选弹窗 -->
 		<u-popup :show="filterShow" @close="closeFilter" mode="top">
-			<view class="filter-pop">
-				<picker mode="selector" :range="levelOption" @change="changeLevel">
-					<view class="filter-level">{{levelText}}</view>
-				</picker>
-				<!-- <input v-model="label" type="text" @confirm="searchResult"> -->
+			<scroll-view scroll-y style="height: 400rpx;" :style="{'padding-top':systemInfo.statusBarHeight+44+'px'}">
+				<view class="filter-pop">
+					<view class="filter-level" :class="item.check?'filter-level--active':''"
+						v-for="(item,index) in levelOption" @click="selectLevel(index)">{{item.name}}</view>
+					<view class="filter-label" :class="item.check?'filter-label--active':''"
+						v-for="(item,index) in labelList" @click="selectLabel(index)">{{item.name}}</view>
+					<!-- <input v-model="label" type="text" @confirm="searchResult"> -->
+				</view>
+			</scroll-view>
+			<view class="filter-button">
+				<view class="filter-label filter-label--active" @click="toReset">重置</view>
+				<view class="filter-level filter-level--active" @click="toFilter">确定</view>
 			</view>
 		</u-popup>
-	</view>
+	</scroll-view>
 </template>
 
 <script>
@@ -30,51 +40,103 @@
 		request
 	} from '@/utils/request.js'
 	import topicItem from '@/components/topic-item/topic-item'
+	import mixin from './mixins.js'
 	export default {
 		components: {
 			topicItem
 		},
 		name: "interview",
-		props: {
-			menuShow: {
-				type: Boolean,
-				default: false,
-			},
-			page: {
-				type: Object,
-				default: () => {
-					main: '';
-					minor: ''
-				}
-			}
-		},
+		mixins: [mixin],
 		data() {
 			return {
-				filterShow: false,
-				zIndex: 30,
-				className: '',
-				systemInfo: getApp().globalData.systemInfo,
 				interviewList: [],
-				levelText: "初级",
-				levelOption: ["初级", "中级", "高级"]
+				levelOption: [{
+					name: "初级",
+					value: 0,
+					check: false,
+				}, {
+					name: "中级",
+					value: 1,
+					check: false,
+				}, {
+					name: "高级",
+					value: 2,
+					check: false,
+				}],
+				labelList: [],
+				levelValue: '',
+				labelValue: [],
+				pages: 1,
+				nodata: false,
 			}
 		},
 		watch: {
 			menuShow(result) {
 				if (this.page.main == 'interview' && this.interviewList.length == 0) {
 					this.getData()
+					this.getLabel()
 				}
 				this.checkPage()
 			},
 		},
-		mounted() {
-			console.log("加载interview")
-			this.checkPage()
-		},
 		methods: {
+			// 滚动到底部
+			loadingData() {
+				if(this.nodata) return
+				this.pages += 1
+				this.getData()
+			},
+			// 重置
+			toReset() {
+				this.levelOption.map(item => {
+					item.check = false
+				})
+				this.labelList.map(item => {
+					item.check = false
+				})
+				this.levelValue = ''
+				this.labelValue = []
+			},
+			// 确定筛选
+			toFilter() {
+				let result = []
+				this.labelList.forEach(item => {
+					if (item.check) {
+						result.push(item.name)
+					}
+				})
+				this.labelValue = result
+				this.interviewList = []
+				this.pages = 1
+				this.nodata = false
+				this.getData()
+				this.closeFilter()
+			},
 			// 选择等级
-			changeLevel(e) {
-				console.log(e);
+			selectLevel(index) {
+				if (this.levelOption[index].check) {
+					this.levelOption[index].check = false
+					this.levelValue = ''
+				} else {
+					this.levelOption.map(item => {
+						item.check = false
+					})
+					this.levelOption[index].check = true
+					this.levelValue = this.levelOption[index].value
+				}
+			},
+			// 选择标签
+			selectLabel(index) {
+				this.labelList[index].check = !this.labelList[index].check
+			},
+			// 获取标签
+			getLabel() {
+				request('get/getLabelList').then(res => {
+					this.labelList = res.data.map(item => {
+						item.check = false
+						return item
+					})
+				})
 			},
 			// 关闭筛选弹窗
 			closeFilter() {
@@ -89,7 +151,7 @@
 					data.option.forEach(item => {
 						if (item.check != item.right) {
 							this.interviewList[index].wrong = true
-							uni.vibrateShort()
+							uni.vibrateLong()
 						}
 					})
 				}
@@ -114,10 +176,12 @@
 				let params = {
 					page: this.pages,
 					limit: 15,
+					level: this.levelValue,
+					label: this.labelValue
 				}
 				request('get/getTopicList', params).then(res => {
 					let list = res.data
-					list.map(item => {
+					list.forEach(item => {
 						item.show = false
 						item.wrong = false
 						item.answered = false
@@ -131,18 +195,12 @@
 								}
 							})
 						}
-						return item
+						this.interviewList.push(item)
 					})
-					this.interviewList = list
+					if (list.length < 15) {
+						this.nodata = true
+					}
 				})
-			},
-			checkPage() {
-				let params = this.$handle.className(this.menuShow, this.page, 'interview')
-				this.className = params.class
-				this.zIndex = params.zIndex
-			},
-			switchInPage() {
-				this.$emit("switch", 'interview')
 			},
 		}
 	}
@@ -153,27 +211,66 @@
 
 	// @import url('@/static/scss/animate.scss');
 	.filter-pop {
-		width: 100%;
-		height: 400rpx;
 		position: relative;
+		display: flex;
+		flex-wrap: wrap;
+		padding: 0 40rpx;
 
-		.filter-level {
-			position: absolute;
-			bottom: 100rpx;
-			left: 60rpx;
-			width: 168rpx;
-			height: 60rpx;
-			text-align: center;
-			line-height: 60rpx;
-			border-radius: 16rpx;
-			background-color: $color-main;
-			color: #fff;
-			font-size: 28rpx;
-		}
+	}
+
+	.filter-level {
+		padding: 0 30rpx;
+		height: 60rpx;
+		text-align: center;
+		line-height: 60rpx;
+		border-radius: 16rpx;
+		border: 4rpx solid $color-shallow;
+		color: $color-shallow;
+		font-size: 26rpx;
+		margin: 0 20rpx 20rpx 0;
+	}
+
+	.filter-level--active {
+		background-color: $color-shallow;
+		border: 4rpx solid transparent;
+		color: #fff;
+	}
+
+	.filter-label {
+		padding: 0 20rpx;
+		height: 60rpx;
+		text-align: center;
+		line-height: 60rpx;
+		border-radius: 16rpx;
+		border: 4rpx solid $color-main;
+		color: $color-main;
+		font-size: 26rpx;
+		margin: 0 20rpx 20rpx 0;
+	}
+
+	.filter-label--active {
+		background-color: $color-main;
+		border: 4rpx solid transparent;
+		color: #fff;
+	}
+
+	.filter-button {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding: 20rpx 60rpx;
 	}
 
 	.interview-list {
 		padding: 0 40rpx;
+		&__block{
+		opacity: 0;
+			@for $i from 1 to 99 {
+				&:nth-child(#{$i}) {
+					animation: fade-in-bottom .8s forwards $i*0.1s;
+				}
+			}
+		}
 	}
 
 	.filter-bar {

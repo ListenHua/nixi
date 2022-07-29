@@ -1,5 +1,5 @@
 <template>
-	<view :class="['view-content',className]"
+	<scroll-view scroll-y :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
 		<view v-if="recordList.length==0" class="placeholder-block">
@@ -28,30 +28,16 @@
 				</view>
 			</view>
 		</view>
-	</view>
+	</scroll-view>
 </template>
 
 <script>
+	import mixin from './mixins.js'
 	export default {
 		name:"record",
-		props: {
-			menuShow: {
-				type: Boolean,
-				default: false,
-			},
-			page: {
-				type: Object,
-				default: () => {
-					main: '';
-					minor: ''
-				}
-			}
-		},
+		mixins:[mixin],
 		data() {
 			return {
-				zIndex: 30,
-				className: '',
-				systemInfo: getApp().globalData.systemInfo,
 				recordList: [],
 			}
 		},
@@ -65,14 +51,6 @@
 			this.checkPage()
 		},
 		methods: {
-			checkPage() {
-				let params = this.$handle.className(this.menuShow, this.page, 'record')
-				this.className = params.class
-				this.zIndex = params.zIndex
-			},
-			switchInPage() {
-				this.$emit("switch", 'record')
-			},
 			refresh() {
 				console.log("刷新浏览记录");
 				this.recordList = []

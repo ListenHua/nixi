@@ -7,7 +7,6 @@
 		background-color: #fff;
 		transition: all .5s;
 		box-sizing: border-box;
-		overflow: scroll;
 	}
 	.page-content{
 		padding-bottom: 50rpx;

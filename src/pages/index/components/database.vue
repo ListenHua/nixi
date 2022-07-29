@@ -22,27 +22,13 @@
 	import {
 		request
 	} from "@/utils/request.js"
+	import mixin from './mixins.js'
 	export default {
-		name: "recommend",
-		props: {
-			menuShow: {
-				type: Boolean,
-				default: false,
-			},
-			page: {
-				type: Object,
-				default: () => {
-					main: '';
-					minor: ''
-				}
-			}
-		},
+		name: "database",
+		mixins:[mixin],
 		data() {
 			return {
-				zIndex: 30,
-				className: '',
-				recommendList: [],
-				systemInfo: getApp().globalData.systemInfo,
+				recommendList:[],
 				scrollTop: 0,
 			}
 		},
@@ -55,20 +41,12 @@
 			},
 		},
 		mounted() {
-			console.log("加载recommend")
+			console.log("加载database")
 			this.checkPage()
 		},
 		methods: {
 			pageScroll(e) {
 				this.scrollTop = e.detail.scrollTop
-			},
-			checkPage() {
-				let params = this.$handle.className(this.menuShow, this.page, 'database')
-				this.className = params.class
-				this.zIndex = params.zIndex
-			},
-			switchInPage() {
-				this.$emit("switch", 'database')
 			},
 			// 去搜索
 			toSearch() {

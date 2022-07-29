@@ -12,27 +12,31 @@
 				@click="switchFuc(item.value)">{{item.title}}
 			</view>
 		</view>
-		<Record ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Record>
-		<Recommend :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Recommend>
-		<Interview :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Interview>
-		<Main :menuShow="menuShow" :page="pageParams" @switch="switchPage"></Main>
-		<Setting :menuShow="menuShow" :page="pageParams" @switch="switchPage" @changeBg="changeBackground"></Setting>
+		<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
+		<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
+		<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
+		<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage" @changeBg="changeBackground">
+		</setting-view>
+		<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
 	</view>
 </template>
 
 <script>
-	import Recommend from './components/recommend.vue'
-	import Setting from './components/setting.vue'
-	import Record from './components/record.vue'
-	import Interview from './components/interview.vue'
-	import Main from './components/main.vue'
+	import {
+		request
+	} from '@/utils/request.js'
+	import DatabaseView from './components/database.vue'
+	import SettingView from './components/setting.vue'
+	import RecordView from './components/record.vue'
+	import InterviewView from './components/interview.vue'
+	import MainView from './components/main.vue'
 	export default {
 		components: {
-			Recommend,
-			Record,
-			Interview,
-			Main,
-			Setting,
+			DatabaseView,
+			RecordView,
+			InterviewView,
+			MainView,
+			SettingView,
 		},
 		data() {
 			return {
@@ -46,7 +50,7 @@
 				systemInfo: getApp().globalData.systemInfo,
 				tabList: [{
 						title: "首页",
-						value: "index"
+						value: "main"
 					},
 					{
 						title: "资料库",
@@ -69,22 +73,20 @@
 						value: "setting"
 					}
 				],
+				testData: '',
 			}
 		},
 		created() {
 			let background = uni.getStorageSync('backgroundImage')
 			this.backgroundImg = background
 			this.pageParams = {
-				main: 'index',
+				main: 'main',
 				minor: ''
 			}
 		},
 		onLoad() {},
 		onShareAppMessage() {
 
-		},
-		onShow() {
-			this.$refs.record.refresh()
 		},
 		methods: {
 			// 切换页面
@@ -98,7 +100,7 @@
 					this.pageParams = obj
 				}
 				this.menuShow = false
-				console.log("params",this.pageParams)
+				console.log("params", this.pageParams)
 			},
 			// 菜单栏操作
 			switchFuc(val) {
@@ -122,6 +124,7 @@
 		background-size: cover;
 		background-clip: content-box;
 		background-repeat: no-repeat;
+
 		.no-shadow {
 			box-shadow: none !important;
 		}
@@ -195,5 +198,4 @@
 			}
 		}
 	}
-
 </style>

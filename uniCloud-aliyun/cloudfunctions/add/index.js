@@ -11,11 +11,28 @@ exports.main = async (event, context) => {
 		case 'addVersion': {
 			return addVersion(event.params)
 		}
+		case 'addLabel': {
+			return addLabel(event.params)
+		}
 		default: {
 			return
 		}
 	}
 };
+
+async function addLabel(event) {
+	let {
+		name,
+	} = event
+	const collection = db.collection('labelList')
+	let res = await collection.add({
+		name
+	})
+	return {
+		code: 200,
+		message: '新增成功!',
+	}
+}
 
 async function addVersion(event) {
 	let {
@@ -25,7 +42,7 @@ async function addVersion(event) {
 	const collection = db.collection('version')
 	let res = await collection.add({
 		version,
-		versionNum:version.replace(/./g,""),
+		versionNum: version.replace(/./g, ""),
 		desc,
 	})
 	return {
@@ -42,14 +59,16 @@ async function addTopic(event) {
 		option,
 		answer,
 		level,
+		creater,
 	} = event
 	const collection = db.collection('topicList')
 	let res = await collection.add({
 		title,
 		type,
-		label,
+		label: label.split(','),
 		option,
 		answer,
+		creater,
 		level,
 	})
 	return {
@@ -60,7 +79,6 @@ async function addTopic(event) {
 
 async function addBookInfo(event) {
 	let {
-		id,
 		cover,
 		author,
 		creater,
@@ -70,14 +88,13 @@ async function addBookInfo(event) {
 	} = event
 	const collection = db.collection('bookList')
 	let res = await collection.add({
-		id,
 		cover,
 		author,
 		creater,
 		title,
 		type,
 		origin,
-		list:[]
+		list: []
 	})
 	console.log(JSON.stringify(res))
 	return {
