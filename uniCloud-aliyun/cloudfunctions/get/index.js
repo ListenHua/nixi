@@ -35,6 +35,7 @@ async function getLabelList(event) {
 		code: 200,
 		msg: "请求成功",
 		data: result
+
 	}
 }
 
@@ -63,7 +64,6 @@ async function getVersion(event) {
 }
 
 async function getTopicList(event) {
-	console.log("event----", typeof(event.level))
 	let cmd = db.command
 	event = event ? event : {}
 	let limit = event.limit ? event.limit : 15
@@ -72,18 +72,25 @@ async function getTopicList(event) {
 	if (event.title) {
 		key.title = new RegExp(event.title)
 	}
-	if (event.level||event.level===0) {
+	if (event.level || event.level === 0) {
 		key.level = event.level
 	}
 	if (event.creater) {
 		key.creater = event.creater
 	}
-	if (event.label&&event.label.length!=0) {
+	if (event.label && event.label.length != 0) {
 		let ary = []
 		event.label.forEach(item => {
 			ary.push(cmd.eq(item))
 		})
 		key.label = cmd.and(ary)
+	}
+	if (event.topic && event.topic.length != 0) {
+		let ary = []
+		event.topic.forEach(item => {
+			ary.push(cmd.eq(item))
+		})
+		key._id = cmd.or(ary)
 	}
 	let start = page * limit
 	let res;
@@ -104,7 +111,7 @@ async function getTopicList(event) {
 	return {
 		code: 200,
 		msg: "请求成功",
-		total:total.total,
+		total: total.total,
 		data: result
 	}
 }
@@ -141,7 +148,7 @@ async function getBookList(event) {
 	return {
 		code: 200,
 		msg: "请求成功",
-		total:total.total,
+		total: total.total,
 		data: result
 	}
 }

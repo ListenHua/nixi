@@ -17,6 +17,7 @@ exports.main = async (event, context) => {
 };
 
 async function qrcode(event) {
+	console.log('qrcode---event----->',event);
 	let timestamp = new Date().getTime()
 	const collection = db.collection('serverCache')
 	let serverAccess = (await collection.where({
@@ -38,8 +39,8 @@ async function qrcode(event) {
 		accessToken = serverAccess.accessToken
 	}
 	let params = {
-		"page": "pages/index/index",
-		"scene": "a=1",
+		"page": event.path,
+		"scene": event.scene,
 		"check_path": true,
 		"env_version": "release"
 	}
@@ -53,9 +54,5 @@ async function qrcode(event) {
 		cloudPath: 'qrcode' + timestamp + '.jpg',
 		fileContent: wxdata.data
 	})
-	return {
-		code: 200,
-		msg: "请求成功",
-		data: image.fileID
-	}
+	return image.fileID
 }

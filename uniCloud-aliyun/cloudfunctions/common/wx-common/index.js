@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken"); //webjsontoken
 //生成token
-function getToken(openid) {
+function getToken(userInfo) {
 	// sign(加密数据，加密辅助，过期时间(单位/s))
 	return jwt.sign({
-		openid
+		userInfo
 	}, appSecret, {
 		expiresIn: 60 * 60 * 24 * 30
 	});

@@ -1,5 +1,8 @@
 'use strict';
 const db = uniCloud.database()
+const {
+	verifyToken
+} = require("wx-common");
 exports.main = async (event, context) => {
 	switch (event.action) {
 		case 'addBookInfo': {
@@ -14,11 +17,79 @@ exports.main = async (event, context) => {
 		case 'addLabel': {
 			return addLabel(event.params)
 		}
+		case 'createSubject': {
+			return createSubject(event.params)
+		}
 		default: {
 			return
 		}
 	}
 };
+
+async function createSubject(event) {
+	let {
+		title,
+		topic,
+		token,
+		number,
+		endTime,
+	} = event
+	// 验证参数
+	if (!event.topic) {
+		return {
+			code: 400,
+			msg: "请选择相应的题目",
+		}
+	} else if (!event.title) {
+		return {
+			code: 400,
+			msg: "请输入试卷标题"
+		}
+	} else if (!event.token) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	let userInfo = verifyToken(event.token)
+	let time = new Date().getTime()
+	const collection = db.collection('testPaper')
+	let res = await collection.add({
+		title,
+		topic,
+		token,
+		number,
+		endTime,
+		createTime: time,
+		creator: userInfo.userInfo,
+		qrcode: '',
+	})
+	console.log('exam-------->', res);
+
+	let qrcode = await uniCloud.callFunction({
+		name: "public",
+		data: {
+			action: "qrcode",
+			params: {
+				path: "pages/topic/exam",
+				scene: `id=${res.id}`
+			}
+		}
+	})
+	console.log('qrcode-------->', qrcode);
+	await collection.doc(res.id).update({
+		qrcode: qrcode.result
+	})
+
+	return {
+		code: 200,
+		msg: "生成成功!",
+		data: {
+			shareImg:qrcode,
+			id:res.id
+		}
+	}
+}
 
 async function addLabel(event) {
 	let {

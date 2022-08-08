@@ -84,7 +84,18 @@
 				minor: ''
 			}
 		},
-		onLoad() {},
+		onLoad() {
+			// 测试生成面试题
+			// let params = {
+			// 	topic: ["62c8f7572f77c4000199dc8f", "62c8f5d166ea6e00016b75e8"],
+			// 	title:"test",
+			// 	endTime:new Date().getTime()+72000,
+			// 	number:1,
+			// }
+			// request('add/createSubject', params).then(res => {
+			// 	console.log(res);
+			// })
+		},
 		onShareAppMessage() {
 
 		},
