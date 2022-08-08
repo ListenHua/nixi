@@ -12,6 +12,7 @@
 				@click="switchFuc(item.value)">{{item.title}}
 			</view>
 		</view>
+		<test-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></test-view>
 		<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
 		<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
 		<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
@@ -30,6 +31,7 @@
 	import RecordView from './components/record.vue'
 	import InterviewView from './components/interview.vue'
 	import MainView from './components/main.vue'
+	import TestView from './components/test.vue'
 	export default {
 		components: {
 			DatabaseView,
@@ -37,6 +39,7 @@
 			InterviewView,
 			MainView,
 			SettingView,
+			TestView
 		},
 		data() {
 			return {
@@ -64,14 +67,14 @@
 						title: "浏览记录",
 						value: "record"
 					},
-					// {
-					// 	title: "我的",
-					// 	value: ""
-					// },
 					{
 						title: "设置",
 						value: "setting"
-					}
+					},
+					{
+						title: "内测功能",
+						value: "test"
+					},
 				],
 				testData: '',
 			}

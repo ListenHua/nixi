@@ -24,7 +24,6 @@
 						v-for="(item,index) in levelOption" @click="selectLevel(index)">{{item.name}}</view>
 					<view class="filter-label" :class="item.check?'filter-label--active':''"
 						v-for="(item,index) in labelList" @click="selectLabel(index)">{{item.name}}</view>
-					<!-- <input v-model="label" type="text" @confirm="searchResult"> -->
 				</view>
 			</scroll-view>
 			<view class="filter-button">
@@ -82,7 +81,7 @@
 		methods: {
 			// 滚动到底部
 			loadingData() {
-				if(this.nodata) return
+				if (this.nodata) return
 				this.pages += 1
 				this.getData()
 			},
@@ -219,12 +218,12 @@
 	}
 
 	.filter-level {
-		padding: 0 30rpx;
-		height: 60rpx;
+		padding: 0 20rpx;
+		height: 50rpx;
 		text-align: center;
-		line-height: 60rpx;
-		border-radius: 16rpx;
-		border: 4rpx solid $color-shallow;
+		line-height: 50rpx;
+		border-radius: 8rpx;
+		border: 2rpx solid $color-shallow;
 		color: $color-shallow;
 		font-size: 26rpx;
 		margin: 0 20rpx 20rpx 0;
@@ -232,17 +231,17 @@
 
 	.filter-level--active {
 		background-color: $color-shallow;
-		border: 4rpx solid transparent;
+		border: 2rpx solid transparent;
 		color: #fff;
 	}
 
 	.filter-label {
 		padding: 0 20rpx;
-		height: 60rpx;
+		height: 50rpx;
 		text-align: center;
-		line-height: 60rpx;
-		border-radius: 16rpx;
-		border: 4rpx solid $color-main;
+		line-height: 50rpx;
+		border-radius: 8rpx;
+		border: 2rpx solid $color-main;
 		color: $color-main;
 		font-size: 26rpx;
 		margin: 0 20rpx 20rpx 0;
@@ -250,7 +249,7 @@
 
 	.filter-label--active {
 		background-color: $color-main;
-		border: 4rpx solid transparent;
+		border: 2rpx solid transparent;
 		color: #fff;
 	}
 
@@ -263,8 +262,10 @@
 
 	.interview-list {
 		padding: 0 40rpx;
-		&__block{
-		opacity: 0;
+
+		&__block {
+			opacity: 0;
+
 			@for $i from 1 to 99 {
 				&:nth-child(#{$i}) {
 					animation: fade-in-bottom .8s forwards $i*0.1s;

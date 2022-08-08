@@ -51,6 +51,12 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/topic/create",
+			"style": {
+				"navigationBarTitleText": "创建面试题"
+			}
 		}
 	],
 	"subPackages": [],

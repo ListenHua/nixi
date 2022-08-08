@@ -28,7 +28,6 @@
 				</view>
 			</view>
 			<!-- 面试题 -->
-			
 			<view class="info-block">
 				<view class="info-block__top">
 					<view class="info-block__top__title">面试题</view>
@@ -56,7 +55,7 @@
 			topicItem
 		},
 		name: "main",
-		mixins:[mixin],
+		mixins: [mixin],
 		data() {
 			return {
 				userInfo: {},
@@ -79,35 +78,34 @@
 			this.checkPage()
 		},
 		methods: {
-				// 显示答案
-				showAnswer(index) {
-					let data = this.topicData
-					this.topicData.show = !this.topicData.show
-					this.topicData.answered = true
-					if (data.type !== 2 && !data.wrong) {
-						data.option.forEach(item => {
-							if (item.check != item.right) {
-								this.topicData.wrong = true
-								uni.vibrateLong()
-							}
-						})
-					}
-				},
-				// 选择答案
-				selectAnswer(index, i) {
-					let data = this.topicData
-					let type = data.type
-					if (data.answered) return
-					if (type === 0) {
-						this.topicData.option.map(item => {
-							item.check = false
-						})
-						this.topicData.option[i].check = true
-					} else if (type === 1) {
-						this.topicData.option[i].check = !this.topicData.option[i].check
-					}
-			
-				},
+			// 显示答案
+			showAnswer(index) {
+				let data = this.topicData
+				this.topicData.show = !this.topicData.show
+				this.topicData.answered = true
+				if (data.type !== 2 && !data.wrong) {
+					data.option.forEach(item => {
+						if (item.check != item.right) {
+							this.topicData.wrong = true
+							uni.vibrateLong()
+						}
+					})
+				}
+			},
+			// 选择答案
+			selectAnswer(index, i) {
+				let data = this.topicData
+				let type = data.type
+				if (data.answered) return
+				if (type === 0) {
+					this.topicData.option[i].check = !this.topicData.option[i].check
+				} else if (type === 1) {
+					this.topicData.option.map(item => {
+						item.check = false
+					})
+					this.topicData.option[i].check = true
+				}
+			},
 			// 去详情
 			viewPage(id) {
 				uni.navigateTo({
@@ -216,6 +214,7 @@
 			margin-top: 60rpx;
 			padding-bottom: 60rpx;
 			min-height: 400rpx;
+
 			&__top {
 				display: flex;
 				justify-content: space-between;
@@ -280,7 +279,8 @@
 					}
 				}
 			}
-			.interview-block{
+
+			.interview-block {
 				margin-top: 20rpx;
 			}
 		}
@@ -296,12 +296,14 @@
 		-webkit-animation: shadow-drop-center 1s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 		animation: shadow-drop-center 1s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 	}
+
 	.fade-in-bottom {
 		-webkit-animation: fade-in-bottom 1s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
-		        animation: fade-in-bottom 1s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+		animation: fade-in-bottom 1s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 	}
+
 	.text-focus-in {
 		-webkit-animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
-		        animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+		animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 	}
 </style>

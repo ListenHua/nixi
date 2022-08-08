@@ -51,6 +51,11 @@ const routers = {
 		path: PATH + "topic/exam",
 		name: "",
 		custom: false
+	},
+	createTopic: {
+		path: PATH + "topic/create",
+		name: "创建面试题",
+		custom: false
 	}
 
 }
