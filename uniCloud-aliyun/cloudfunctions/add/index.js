@@ -20,11 +20,32 @@ exports.main = async (event, context) => {
 		case 'createSubject': {
 			return createSubject(event.params)
 		}
+		case 'answerResult': {
+			return answerResult(event.params)
+		}
 		default: {
 			return
 		}
 	}
 };
+
+async function answerResult(event) {
+	if (!event.token) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	let userInfo = verifyToken(event.token)
+	const collection = db.collection('answerHistory')
+	delete event.token
+	let res = await collection.add(event)
+	return {
+		code: 200,
+		msg: "提交成功!",
+		data: ''
+	}
+}
 
 async function createSubject(event) {
 	let {

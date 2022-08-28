@@ -19,5 +19,4 @@
 	@import "uview-ui/index.scss";
 	@import "@/static/scss/index.scss";
 	@import '@/static/scss/animate.scss';
-	
 </style>

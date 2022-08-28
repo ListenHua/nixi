@@ -71,10 +71,6 @@
 						title: "设置",
 						value: "setting"
 					},
-					{
-						title: "实验室",
-						value: "test"
-					},
 				],
 				testData: '',
 			}
@@ -87,8 +83,16 @@
 				minor: ''
 			}
 		},
+		onShow() {
+			if (uni.getStorageSync('userInfo').role > 0) {
+				this.tabList.push({
+					title: "实验室",
+					value: "test"
+				})
+			}
+		},
 		onLoad() {
-			
+
 		},
 		onShareAppMessage() {
 
@@ -124,7 +128,7 @@
 	.page-content {
 		width: 100%;
 		position: relative;
-		background: linear-gradient(to right, $color-main,#4364f7,#6fb1fc);
+		background: linear-gradient(to right, $color-main, #4364f7, #6fb1fc);
 		background-position: center;
 		background-size: cover;
 		background-clip: content-box;

@@ -9,7 +9,8 @@
 					<view class="name text-focus-in" v-if="isLogin">{{userInfo.nickName}}</view>
 					<view class="login-text" v-else @click="toLogin">点击登录</view>
 				</view>
-				<image v-if="isLogin" class="avatar shadow-drop-center" :src="userInfo.avatarUrl"></image>
+				<image v-if="isLogin" class="avatar shadow-drop-center" :src="userInfo.avatarUrl" @click="updateInfo">
+				</image>
 				<image v-else class="avatar shadow-drop-center" src="/static/images/logo.png" @click="toLogin"></image>
 			</view>
 			<!-- 资料库 -->
@@ -78,6 +79,23 @@
 			this.checkPage()
 		},
 		methods: {
+			// 更新用户信息
+			updateInfo() {
+				uni.login({
+					success: (res) => {
+						request('user/login', {
+							code: res.code
+						}).then(res => {
+							if (res.data) {
+								if (res.data.token) {
+									uni.setStorageSync('token', res.data.token)
+									uni.setStorageSync('userInfo', res.data.userInfo)
+								}
+							}
+						})
+					}
+				})
+			},
 			// 显示答案
 			showAnswer(index) {
 				let data = this.topicData

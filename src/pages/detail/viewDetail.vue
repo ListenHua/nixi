@@ -21,7 +21,7 @@
 		<view class="data-list" v-if="readHabit=='scroll'">
 			<view class="block line" v-for="(item,index) in info.list" :key="index">
 				<view class="title">{{item.title}}</view>
-				<n-parse :content="item.content"></n-parse>
+				<uni-parse :content="item.content"></uni-parse>
 			</view>
 		</view>
 		<swiper v-if="readHabit=='swiper'" class="data-list" :current="contentIndex"
@@ -29,7 +29,7 @@
 			<swiper-item class="block" v-for="(item,index) in info.list" :key="index">
 				<scroll-view scroll-y :style="{'height':screenHeight+'px'}">
 					<view class="title">{{item.title}}</view>
-					<n-parse :content="item.content"></n-parse>
+					<uni-parse :content="item.content"></uni-parse>
 					<view style="width: 100%;height: 20rpx;"></view>
 				</scroll-view>
 			</swiper-item>
@@ -38,11 +38,11 @@
 </template>
 
 <script>
-	import nParse from '@/components/n-parse/parse.vue'
 	var timer;
-	export default {
+	import uniParse from '@/uni_modules/uni-parse/parse'
+ 	export default {
 		components:{
-			nParse
+			uniParse
 		},
 		data() {
 			return {

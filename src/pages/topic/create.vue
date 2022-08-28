@@ -46,11 +46,11 @@
 							<input v-model="topicInfo.title" type="text" placeholder="请输入试卷标题">
 						</template>
 					</u-cell>
-					<u-cell title="试卷数量" size="large" :titleStyle="{'white-space': 'nowrap'}">
+					<!-- <u-cell title="试卷数量" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
-							<input v-model="topicInfo.number" type="number" placeholder="0为无限数量">
+							<input v-model="topicInfo.number" type="number" placeholder="不填则无限数量">
 						</template>
-					</u-cell>
+					</u-cell> -->
 					<u-cell title="截止时间" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
 							<picker mode="date" :start="startDate" @change="changeEndTime">
@@ -60,7 +60,7 @@
 					</u-cell>
 					<u-cell title="时间限制" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
-							<input v-model="topicInfo.limitTime" type="number" maxlength="3" placeholder="0为不限制时间">
+							<input v-model="topicInfo.limitTime" type="number" maxlength="3" placeholder="不填则不限制时间">
 						</template>
 						<template #right-icon>
 							<view>分钟</view>
@@ -87,7 +87,6 @@
 </template>
 
 <script>
-	import nParse from '@/components/n-parse/parse'
 	import topicItem from '@/components/topic-item/topic-item'
 	import {
 		request
@@ -95,7 +94,6 @@
 	import dayjs from 'dayjs'
 	export default {
 		components: {
-			nParse,
 			topicItem
 		},
 		data() {
@@ -143,17 +141,32 @@
 			this.getData()
 			this.startDate = dayjs().add(1, 'day').format('YYYY-MM-DD')
 			this.topicInfo.endTime = dayjs().add(1, 'day').format('YYYY-MM-DD')
-
 		},
 		methods: {
 			// 保存二维码
 			saveCodeImage() {
-				uni.saveImageToPhotosAlbum({
-					filePath: this.successInfo.code,
-					success: () => {
-						uni.showToast({
-							title: "保存成功!"
+				uni.getImageInfo({
+					src: this.successInfo.code,
+					success: (res) => {
+						let path = res.path;
+						uni.saveImageToPhotosAlbum({
+							filePath: path,
+							success: (res) => {
+								uni.showToast({
+									title:"保存成功!"
+								})
+							},
+							fail: (res) => {
+								uni.showToast({
+									title:"保存成功!",
+									icon:"none"
+								})
+							}
 						})
+					},
+					fail(res) {
+						console.log(res)
+						this.toast('保存失败')
 					}
 				})
 			},
@@ -167,6 +180,16 @@
 			// 生成试题
 			createToExam() {
 				let info = this.topicInfo
+				if(info.limitTime){
+					if(info.limitTime<=0){
+						uni.showToast({
+							title:"答题限制时间不能小于或等于0",
+							icon:"none"
+						})
+						this.examInfoPop = true
+						return
+					}
+				}
 				let params = {
 					title: info.title,
 					topic: this.selectList,

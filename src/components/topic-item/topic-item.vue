@@ -7,30 +7,28 @@
 			<view class="interview-block__info__tag" v-for="(item,index) in tagList">{{item}}</view>
 		</view>
 		<view class="interview-block__title">
-			<n-parse :content='item.title'></n-parse>
+			<uni-parse :content='item.title'></uni-parse>
 		</view>
 		<!-- 选项或答案区 -->
 		<template v-if="answer">
 			<!-- 多选 -->
 			<view class="interview-block__checkbox" v-if="item.type===0">
-				<view class="interview-block__option"
-					:class="[!item.show&&items.check?'interview-block__select':'',item.show&&items.right?'interview-block__answer':'']"
+				<view class="interview-block__option" :class="[answerShowClass(item,items)]"
 					v-for="(items,i) in item.option" @click="selectAnswer(index,i)">
-					<n-parse :content='items.content'></n-parse>
+					<uni-parse :content='items.content'></uni-parse>
 				</view>
 			</view>
 			<!-- 单选 -->
 			<view class="interview-block__checkbox" v-else-if="item.type===1">
-				<view class="interview-block__option"
-					:class="[items.check?'interview-block__select':'',item.show&&items.right?'interview-block__answer':'']"
+				<view class="interview-block__option" :class="[answerShowClass(item,items)]"
 					v-for="(items,i) in item.option" @click="selectAnswer(index,i)">
-					<n-parse :content='items.content'></n-parse>
+					<uni-parse :content='items.content'></uni-parse>
 				</view>
 			</view>
 			<!-- 答案 -->
 			<view class="interview-block__text" v-else-if="item.type===2" v-show="item.show">
 				<view class="interview-block__text__content">
-					<n-parse :content='item.answer'></n-parse>
+					<uni-parse :content='item.answer'></uni-parse>
 				</view>
 			</view>
 		</template>
@@ -63,10 +61,10 @@
 </template>
 
 <script>
-	import nParse from '@/components/n-parse/parse'
+	import uniParse from '@/uni_modules/uni-parse/parse'
 	export default {
 		components: {
-			nParse
+			uniParse
 		},
 		name: "topic-item",
 		props: {
@@ -85,6 +83,23 @@
 			answer: {
 				type: Boolean,
 				default: true,
+			}
+		},
+		computed: {
+			answerShowClass(item, items) {
+				return (item, items) => {
+					let ary = []
+					if (!item.show && item.wrong && items.check) {
+						ary.push('interview-block__wrong')
+					} else if (!item.show && items.check) {
+						ary.push('interview-block__select')
+					}
+					if (item.show && items.right) {
+						ary.push('interview-block__answer')
+					}
+
+					return ary
+				}
 			}
 		},
 		data() {
@@ -132,7 +147,7 @@
 			&__tag {
 				padding: 8rpx 16rpx;
 				border-radius: 8rpx;
-				background-color: rgba(52,120,245, 0.5);
+				background-color: rgba(52, 120, 245, 0.5);
 				margin-left: 10rpx;
 				margin-bottom: 10rpx;
 				font-size: 24rpx;
@@ -154,7 +169,11 @@
 		}
 
 		&__select {
-			background-color: rgba(52,120,245, 0.2);
+			background-color: rgba(52, 120, 245, 0.2);
+		}
+
+		&__wrong {
+			background-color: rgba(255, 59, 43, 0.2);
 		}
 
 		&__answer {

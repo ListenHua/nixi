@@ -1,17 +1,17 @@
 <template>
 	<view class="page-content">
-		<n-parse :content="content"></n-parse>
+		<uni-parse :content="content"></uni-parse>
 	</view>
 </template>
 
 <script>
-	import nParse from '@/components/n-parse/parse'
 	import {
 		request
 	} from '@/utils/request.js'
-	export default {
-		components: {
-			nParse
+	import uniParse from '@/uni_modules/uni-parse/parse'
+ 	export default {
+		components:{
+			uniParse
 		},
 		data() {
 			return {
