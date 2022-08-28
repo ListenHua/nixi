@@ -36,23 +36,24 @@ async function createSubject(event) {
 		endTime,
 	} = event
 	// 验证参数
-	if (event.topic.length <= 0) {
+	if (topic.length <= 0) {
 		return {
 			code: 400,
 			msg: "请选择相应的题目",
 		}
-	} else if (!event.title) {
+	} else if (!title) {
 		return {
 			code: 400,
 			msg: "请输入试卷标题"
 		}
-	} else if (!event.token) {
+	} else if (!token) {
 		return {
 			code: 401,
 			msg: "请先授权登录用户"
 		}
 	}
-	let userInfo = verifyToken(event.token)
+	console.log(token);
+	let userInfo = verifyToken(token)
 	let time = new Date().getTime()
 	const collection = db.collection('testPaper')
 	let res = await collection.add({

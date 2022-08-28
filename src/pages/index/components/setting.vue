@@ -59,6 +59,7 @@
 			// 上传图片
 			modBackground() {
 				uni.chooseImage({
+					sizeType: ["compressed "],
 					count: 1,
 					success: (res) => {
 						let filePath = res.tempFilePaths[0]

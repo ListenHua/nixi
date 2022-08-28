@@ -20,9 +20,35 @@ exports.main = async (event, context) => {
 		case 'getLabelList': {
 			return getLabelList(event.params)
 		}
+		case 'getExamDetail': {
+			return getExamDetail(event.params)
+		}
 		default: {
 			return
 		}
+	}
+}
+
+async function getExamDetail(event) {
+	let {
+		id
+	} = event
+	const exam = db.collection('testPaper')
+	let res = await exam.doc(id).get()
+	console.log(res);
+	let result = res.data[0]
+	delete result.token
+	let topic;
+	await getTopicList({
+		topic: result.topic
+	}).then(data => {
+		topic = data.data
+	})
+	return {
+		code: 200,
+		msg: "请求成功",
+		data: result,
+		topic,
 	}
 }
 
@@ -35,7 +61,6 @@ async function getLabelList(event) {
 		code: 200,
 		msg: "请求成功",
 		data: result
-
 	}
 }
 
@@ -64,6 +89,7 @@ async function getVersion(event) {
 }
 
 async function getTopicList(event) {
+	console.log(event);
 	let cmd = db.command
 	event = event ? event : {}
 	let limit = event.limit ? event.limit : 15

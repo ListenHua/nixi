@@ -169,7 +169,6 @@
 					})
 					this.interviewList[index].option[i].check = true
 				}
-
 			},
 			// 获取数据
 			getData() {
@@ -208,8 +207,6 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
-
-	// @import url('@/static/scss/animate.scss');
 	.filter-pop {
 		position: relative;
 		display: flex;

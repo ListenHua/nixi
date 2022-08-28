@@ -41,24 +41,24 @@
 			<view class="exam-info">
 				<view class="exam-info__title">试卷信息</view>
 				<view class="exam-cell">
-					<u-cell title="试卷标题" size="large">
+					<u-cell title="试卷标题" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
 							<input v-model="topicInfo.title" type="text" placeholder="请输入试卷标题">
 						</template>
 					</u-cell>
-					<u-cell title="试卷数量" size="large">
+					<u-cell title="试卷数量" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
 							<input v-model="topicInfo.number" type="number" placeholder="0为无限数量">
 						</template>
 					</u-cell>
-					<u-cell title="截止时间" size="large">
+					<u-cell title="截止时间" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
 							<picker mode="date" :start="startDate" @change="changeEndTime">
 								<view>{{topicInfo.endTime}}</view>
 							</picker>
 						</template>
 					</u-cell>
-					<u-cell title="时间限制" size="large">
+					<u-cell title="时间限制" size="large" :titleStyle="{'white-space': 'nowrap'}">
 						<template #value>
 							<input v-model="topicInfo.limitTime" type="number" maxlength="3" placeholder="0为不限制时间">
 						</template>
@@ -146,6 +146,17 @@
 
 		},
 		methods: {
+			// 保存二维码
+			saveCodeImage() {
+				uni.saveImageToPhotosAlbum({
+					filePath: this.successInfo.code,
+					success: () => {
+						uni.showToast({
+							title: "保存成功!"
+						})
+					}
+				})
+			},
 			// 关闭成功弹窗
 			closeCreateSuccess() {
 				this.createSuccessPop = false
@@ -159,10 +170,14 @@
 				let params = {
 					title: info.title,
 					topic: this.selectList,
-					number: info.number ? info.number : 0,
-					limitTime: info.limitTime ? info.limitTime : 0,
+					number: info.number ? info.number : -1,
+					limitTime: info.limitTime ? info.limitTime : -1,
 					endTime: info.endTime,
 				}
+				uni.showLoading({
+					title: "生成中...",
+					mask: true
+				})
 				request('add/createSubject', params).then(res => {
 					let {
 						shareImg,
@@ -173,8 +188,9 @@
 						id,
 					}
 					this.createSuccessPop = true
+					uni.hideLoading()
 				}).catch(res => {
-					console.log('error', res);
+					uni.hideLoading()
 					uni.showToast({
 						title: res.msg,
 						icon: "none"
