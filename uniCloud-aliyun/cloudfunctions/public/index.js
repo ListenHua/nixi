@@ -41,7 +41,7 @@ async function qrcode(event) {
 	let params = {
 		"page": event.path,
 		"scene": event.scene,
-		"check_path": true,
+		"check_path": false,
 		"env_version": "release"
 	}
 	const wxdata = await uniCloud.httpclient.request(

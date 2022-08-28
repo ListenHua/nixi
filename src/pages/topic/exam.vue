@@ -11,6 +11,9 @@
 				
 			}
 		},
+		onLoad(option) {
+			console.log(option);
+		},
 		methods: {
 			
 		}

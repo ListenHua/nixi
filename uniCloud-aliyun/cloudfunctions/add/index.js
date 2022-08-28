@@ -32,10 +32,11 @@ async function createSubject(event) {
 		topic,
 		token,
 		number,
+		limitTime,
 		endTime,
 	} = event
 	// 验证参数
-	if (!event.topic) {
+	if (event.topic.length <= 0) {
 		return {
 			code: 400,
 			msg: "请选择相应的题目",
@@ -59,6 +60,7 @@ async function createSubject(event) {
 		topic,
 		token,
 		number,
+		limitTime,
 		endTime,
 		createTime: time,
 		creator: userInfo.userInfo,
@@ -72,7 +74,7 @@ async function createSubject(event) {
 			action: "qrcode",
 			params: {
 				path: "pages/topic/exam",
-				scene: `id=${res.id}`
+				scene: res.id
 			}
 		}
 	})
@@ -85,8 +87,8 @@ async function createSubject(event) {
 		code: 200,
 		msg: "生成成功!",
 		data: {
-			shareImg:qrcode,
-			id:res.id
+			shareImg: qrcode.result,
+			id: res.id
 		}
 	}
 }

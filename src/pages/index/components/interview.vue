@@ -67,6 +67,7 @@
 				labelValue: [],
 				pages: 1,
 				nodata: false,
+				filterShow:false,
 			}
 		},
 		watch: {

@@ -72,7 +72,7 @@
 						value: "setting"
 					},
 					{
-						title: "内测功能",
+						title: "实验室",
 						value: "test"
 					},
 				],
@@ -88,16 +88,7 @@
 			}
 		},
 		onLoad() {
-			// 测试生成面试题
-			// let params = {
-			// 	topic: ["62c8f7572f77c4000199dc8f", "62c8f5d166ea6e00016b75e8"],
-			// 	title:"test",
-			// 	endTime:new Date().getTime()+72000,
-			// 	number:1,
-			// }
-			// request('add/createSubject', params).then(res => {
-			// 	console.log(res);
-			// })
+			
 		},
 		onShareAppMessage() {
 
@@ -133,7 +124,7 @@
 	.page-content {
 		width: 100%;
 		position: relative;
-		background: linear-gradient(to right, $color-main, $color-second, $color-shallow);
+		background: linear-gradient(to right, $color-main,#4364f7,#6fb1fc);
 		background-position: center;
 		background-size: cover;
 		background-clip: content-box;

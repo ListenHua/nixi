@@ -33,6 +33,7 @@ async function login(event) {
 		openId: openId,
 	}).get()
 	let result = res.data[0]
+	delete result.openId
 	// 生成token
 	let token = getToken(result)
 	if (result) {

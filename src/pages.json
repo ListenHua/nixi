@@ -58,7 +58,16 @@
 				"navigationBarTitleText": "创建面试题"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/topic/detail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"subPackages": [],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
