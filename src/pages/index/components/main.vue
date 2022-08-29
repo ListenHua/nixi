@@ -143,6 +143,7 @@
 				if (info) {
 					this.userInfo = info
 					this.isLogin = true
+					uni.$emit("loginSuccess")
 				}
 				this.getTopicList()
 				this.getBookList()

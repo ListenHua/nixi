@@ -83,16 +83,20 @@
 				minor: ''
 			}
 		},
-		onShow() {
+		onLoad() {
 			if (uni.getStorageSync('userInfo').role > 0) {
 				this.tabList.push({
 					title: "实验室",
 					value: "test"
 				})
+			} else {
+				uni.$once("loginSuccess", () => {
+					this.tabList.push({
+						title: "实验室",
+						value: "test"
+					})
+				})
 			}
-		},
-		onLoad() {
-
 		},
 		onShareAppMessage() {
 

@@ -3,10 +3,11 @@
 		<template v-if="isLogin&&examShow">
 			<u-sticky v-if="examInfo.limitTime>0">
 				<view class="exam-time">
-					<view class="exam-time__process" style="width: 50%;"></view>
+					<view class="exam-time__process" :style="{'width':`${surplusTime/(examInfo.limitTime*60)*100}%`}"></view>
 				</view>
 			</u-sticky>
 			<view class="exam-title">
+					<text>{{surplusTime/(examInfo.limitTime*60)*100}}{{surplusTime}}</text>
 				<text v-if="examInfo.limitTime>0">({{examInfo.limitTime}}分钟)</text>
 				<text>{{examInfo.title}}</text>
 				<u-line margin="40rpx 0 0 0"></u-line>
@@ -61,7 +62,7 @@
 				answerOver: false,
 				resultPop: false,
 				score: 0,
-				examShow:false,
+				examShow: false,
 			}
 		},
 		onShow() {
@@ -147,10 +148,10 @@
 			// 倒计时
 			intervalTime() {
 				let time = this.examInfo.limitTime * 60
-				this.surplusTime = time
+				this.surplusTime = 0
 				this.surplusTimeInterval = setInterval(() => {
-					this.surplusTime -= 1
-					if (this.surplusTime <= 0) {
+					this.surplusTime += 1
+					if (this.surplusTime >=time) {
 						clearInterval(this.surplusTimeInterval)
 					}
 				}, 1000)
