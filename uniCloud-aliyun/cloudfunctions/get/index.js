@@ -36,6 +36,12 @@ async function getExamDetail(event) {
 	const exam = db.collection('testPaper')
 	let res = await exam.doc(id).get()
 	console.log(res);
+	if(res.data.length<=0){
+		return {
+			code: 400,
+			msg: "找不到该试卷",
+		}
+	}
 	let result = res.data[0]
 	delete result.token
 	let topic;

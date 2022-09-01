@@ -15,14 +15,51 @@ export async function request(url, params = {}) {
 					params,
 				}
 			}).then(res => {
-				if (res.result.code <= 300) {
-					resolve(res.result)
-				} else if (res.result.code == 401) {
-					uni.navigateTo({
-						url: '/pages/login/login'
-					})
-				} else {
-					reject(res.result)
+				uni.hideLoading()
+				let code = res.result.code
+				switch (code) {
+					case 200:
+						resolve(res.result)
+						break;
+					case 401:
+						uni.showToast({
+							title: res.result.msg,
+							icon: "none"
+						})
+						setTimeout(() => {
+							uni.navigateTo({
+								url: '/pages/login/login'
+							})
+						}, 1500)
+						reject(res.result)
+						break;
+					case 402:
+						uni.showToast({
+							title: res.result.msg,
+							icon: "none",
+							mask: true,
+							duration: 1000
+						})
+						setTimeout(() => {
+							uni.showLoading({
+								title: "正在更新信息..."
+							})
+							login().then(res => {
+								uni.showToast({
+									title: "更新信息成功!请重新操作",
+									icon: "none"
+								})
+							})
+						}, 1000)
+						reject(res.result)
+						break;
+					default:
+						if (code <= 300) {
+							resolve(res.result)
+						} else {
+							reject(res.result)
+						}
+						break;
 				}
 			})
 			.catch(res => {
@@ -34,8 +71,8 @@ export async function request(url, params = {}) {
 }
 
 export function login() {
-	let token = uni.getStorageSync('token')
-	if (token) return
+	// let token = uni.getStorageSync('token')
+	// if (token) return
 	return new Promise((resolve, reject) => {
 		uni.login({
 			success: (result) => {

@@ -13,7 +13,13 @@ function getToken(userInfo) {
 //解密token
 function verifyToken(token) {
 	return jwt.verify(token, appSecret, (err, decode) => {
-	console.log(err,decode);
+		console.log('verify---->', err, decode);
+		if (err) {
+			if (err.name == 'TokenExpiredError') {
+				return 'expired'
+			}
+		}
+
 		return decode
 	})
 }
@@ -24,4 +30,3 @@ module.exports = {
 	appId,
 	appSecret
 }
-

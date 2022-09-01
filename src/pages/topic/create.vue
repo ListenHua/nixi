@@ -153,20 +153,23 @@
 							filePath: path,
 							success: (res) => {
 								uni.showToast({
-									title:"保存成功!"
+									title: "保存成功!"
 								})
 							},
 							fail: (res) => {
 								uni.showToast({
-									title:"保存成功!",
-									icon:"none"
+									title: "保存失败!",
+									icon: "none"
 								})
 							}
 						})
 					},
 					fail(res) {
 						console.log(res)
-						this.toast('保存失败')
+						uni.showToast({
+							title: "保存失败!",
+							icon: "none"
+						})
 					}
 				})
 			},
@@ -180,11 +183,11 @@
 			// 生成试题
 			createToExam() {
 				let info = this.topicInfo
-				if(info.limitTime){
-					if(info.limitTime<=0){
+				if (info.limitTime) {
+					if (info.limitTime <= 0) {
 						uni.showToast({
-							title:"答题限制时间不能小于或等于0",
-							icon:"none"
+							title: "答题限制时间不能小于或等于0",
+							icon: "none"
 						})
 						this.examInfoPop = true
 						return

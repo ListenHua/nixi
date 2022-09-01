@@ -3,11 +3,11 @@
 		<template v-if="isLogin&&examShow">
 			<u-sticky v-if="examInfo.limitTime>0">
 				<view class="exam-time">
-					<view class="exam-time__process" :style="{'width':`${surplusTime/(examInfo.limitTime*60)*100}%`}"></view>
+					<view class="exam-time__process" :style="{'width':`${surplusTime/(examInfo.limitTime*60)*100}%`}">
+					</view>
 				</view>
 			</u-sticky>
 			<view class="exam-title">
-					<text>{{surplusTime/(examInfo.limitTime*60)*100}}{{surplusTime}}</text>
 				<text v-if="examInfo.limitTime>0">({{examInfo.limitTime}}分钟)</text>
 				<text>{{examInfo.title}}</text>
 				<u-line margin="40rpx 0 0 0"></u-line>
@@ -15,11 +15,12 @@
 			<view class="exam-list">
 				<view class="exam-list__block" :id="'topic'+item._id" v-for="(item,index) in interviewList"
 					:key="index">
-					<topic-item :item='item' :button="answerOver?['study']:[]" :index="index" @select="selectAnswer">
+					<topic-item :item='item' :button="answerOver?['study']:[]" :index="index" @select="selectAnswer"
+						@show="showAnswer">
 					</topic-item>
 				</view>
 			</view>
-			<n-bottom>
+			<n-bottom v-if="!answerOver">
 				<view class="bottom-button">
 					<u-button color="#3478F5" shape="circle" :customStyle="{width:'288rpx',margin:0}"
 						@click="submitAnswer">
@@ -82,6 +83,11 @@
 			this.scrollTop = e.scrollTop
 		},
 		methods: {
+			// 显示答案
+			showAnswer(index) {
+				console.log("show------>", index);
+				this.interviewList[index].show = !this.interviewList[index].show
+			},
 			// 去登陆
 			toLogin() {
 				uni.navigateTo({
@@ -109,10 +115,45 @@
 					id: this.examId
 				}
 				request('get/getExamDetail', params).then(res => {
-					console.log(res);
-					if (res.data.endTime < dayjs().format("YYYY-MM-DD")) {
+						console.log(res);
+						if (res.data.endTime < dayjs().format("YYYY-MM-DD")) {
+							uni.showToast({
+								title: "该试卷已过期😟",
+								icon: "none"
+							})
+							setTimeout(() => {
+								uni.reLaunch({
+									url: '/pages/index/index'
+								})
+							}, 1500)
+							return
+						}
+						this.examShow = true
+						this.examInfo = res.data
+						if (this.examInfo.limitTime > 0) {
+							this.intervalTime()
+						}
+						let list = res.topic
+						list.forEach(item => {
+							item.wrong = false
+							item.answered = false
+							item.show = false
+							if (item.type !== 2) {
+								item.option.map((items, index) => {
+									items.check = false
+									if (item.answer.indexOf(index) == -1) {
+										items.right = false
+									} else {
+										items.right = true
+									}
+								})
+							}
+						})
+						this.interviewList = list
+					})
+					.catch(res => {
 						uni.showToast({
-							title: "该试卷已过期😟",
+							title: res.msg,
 							icon: "none"
 						})
 						setTimeout(() => {
@@ -121,29 +162,7 @@
 							})
 						}, 1500)
 						return
-					}
-					this.examShow = true
-					this.examInfo = res.data
-					if (this.examInfo.limitTime > 0) {
-						this.intervalTime()
-					}
-					let list = res.topic
-					list.forEach(item => {
-						item.wrong = false
-						item.answered = false
-						if (item.type !== 2) {
-							item.option.map((items, index) => {
-								items.check = false
-								if (item.answer.indexOf(index) == -1) {
-									items.right = false
-								} else {
-									items.right = true
-								}
-							})
-						}
 					})
-					this.interviewList = list
-				})
 			},
 			// 倒计时
 			intervalTime() {
@@ -151,8 +170,9 @@
 				this.surplusTime = 0
 				this.surplusTimeInterval = setInterval(() => {
 					this.surplusTime += 1
-					if (this.surplusTime >=time) {
+					if (this.surplusTime >= time) {
 						clearInterval(this.surplusTimeInterval)
+						this.submitAnswer(false)
 					}
 				}, 1000)
 			},
@@ -186,16 +206,18 @@
 				})
 			},
 			// 提交答案
-			submitAnswer() {
-				this.checkAnswer()
-				console.log("是否已完整答题", this.isAnswerAll);
-				if (!this.isAnswerAll) {
-					uni.showToast({
-						title: "请先回答完所有题目",
-						icon: 'none'
-					})
-					this.scrollToUnAnswer()
-					return
+			submitAnswer(check = true) {
+				if (check) {
+					this.checkAnswer()
+					console.log("是否已完整答题", this.isAnswerAll);
+					if (!this.isAnswerAll) {
+						uni.showToast({
+							title: "请先回答完所有题目",
+							icon: 'none'
+						})
+						this.scrollToUnAnswer()
+						return
+					}
 				}
 				this.checkAnswerRight()
 				let params = {

@@ -22,6 +22,9 @@
 
 <script>
 	import mixin from './mixins.js'
+	import {
+		request
+	} from '@/utils/request'
 	export default {
 		name: "setting",
 		mixins: [mixin],
@@ -59,22 +62,33 @@
 			// 上传图片
 			modBackground() {
 				uni.chooseImage({
-					sizeType: ["compressed "],
+					sizeType: ["compressed"],
 					count: 1,
 					success: (res) => {
+						console.log(res);
+						if (res.tempFiles[0].size > 1048576) {
+							uni.showToast({
+								title: "暂不支持上传大于1M的图片",
+								icon: "none"
+							})
+							return
+						}
 						let filePath = res.tempFilePaths[0]
 						let fileName = filePath.substring(filePath.lastIndexOf('/'), filePath.length)
 						uniCloud.uploadFile({
 							cloudPath: fileName,
 							filePath,
 						}).then(res => {
-							uni.setStorageSync('backgroundImage', res.fileID)
-							this.$refs.uToast.show({
-								message: '更换成功',
-								type: 'success',
-								duration: 1500,
+							request('edit/updateBackground', {
+								background: res.fileID
+							}).then(() => {
+								this.$refs.uToast.show({
+									message: '更换成功',
+									type: 'success',
+									duration: 1500,
+								})
+								uni.$emit("refreshUserInfo")
 							})
-							this.$emit("changeBg", res.fileID)
 						})
 					}
 				})
@@ -86,13 +100,17 @@
 					content: "是否要删除当前背景图?",
 					success(res) {
 						if (res.confirm) {
-							uni.removeStorageSync('backgroundImage')
-							that.$refs.uToast.show({
-								message: '移除成功',
-								type: 'success',
-								duration: 1500,
+							request('edit/updateBackground', {
+								background: ''
+							}).then(res => {
+								that.$refs.uToast.show({
+									message: '移除成功',
+									type: 'success',
+									duration: 1500,
+								})
+								uni.$emit("refreshUserInfo")
 							})
-							that.$emit("changeBg", '')
+
 						}
 					}
 				})

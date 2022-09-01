@@ -81,20 +81,13 @@
 		methods: {
 			// 更新用户信息
 			updateInfo() {
-				uni.login({
-					success: (res) => {
-						request('user/login', {
-							code: res.code
-						}).then(res => {
-							if (res.data) {
-								if (res.data.token) {
-									uni.setStorageSync('token', res.data.token)
-									uni.setStorageSync('userInfo', res.data.userInfo)
-								}
-							}
-						})
-					}
-				})
+				login()
+				let info = uni.getStorageSync('userInfo')
+				if (info) {
+					this.userInfo = info
+					this.isLogin = true
+					uni.$emit("userLogin")
+				}
 			},
 			// 显示答案
 			showAnswer(index) {
@@ -143,7 +136,7 @@
 				if (info) {
 					this.userInfo = info
 					this.isLogin = true
-					uni.$emit("loginSuccess")
+					uni.$emit("userLogin")
 				}
 				this.getTopicList()
 				this.getBookList()

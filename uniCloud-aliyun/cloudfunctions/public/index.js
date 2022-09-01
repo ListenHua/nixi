@@ -18,7 +18,7 @@ exports.main = async (event, context) => {
 
 async function qrcode(event) {
 	console.log('qrcode---event----->',event);
-	let timestamp = new Date().getTime()
+	let timestamp = event.time
 	const collection = db.collection('serverCache')
 	let serverAccess = (await collection.where({
 		type: "accessToken"

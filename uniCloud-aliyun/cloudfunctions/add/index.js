@@ -37,8 +37,22 @@ async function answerResult(event) {
 		}
 	}
 	let userInfo = verifyToken(event.token)
+	if (userInfo == 'expired') {
+		return {
+			code: 402,
+			msg: "授权信息过期"
+		}
+	}
+	if (!userInfo) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
 	const collection = db.collection('answerHistory')
 	delete event.token
+	event.answerer = userInfo.userInfo
+	event.answererId = userInfo.userInfo._id
 	let res = await collection.add(event)
 	return {
 		code: 200,
@@ -73,8 +87,20 @@ async function createSubject(event) {
 			msg: "请先授权登录用户"
 		}
 	}
-	console.log(token);
 	let userInfo = verifyToken(token)
+	console.log(userInfo);
+	if (userInfo == 'expired') {
+		return {
+			code: 402,
+			msg: "授权信息过期"
+		}
+	}
+	if (!userInfo) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
 	let time = new Date().getTime()
 	const collection = db.collection('testPaper')
 	let res = await collection.add({
@@ -86,6 +112,7 @@ async function createSubject(event) {
 		endTime,
 		createTime: time,
 		creator: userInfo.userInfo,
+		creatorId: userInfo.userInfo._id,
 		qrcode: '',
 	})
 	console.log('exam-------->', res);
@@ -96,7 +123,8 @@ async function createSubject(event) {
 			action: "qrcode",
 			params: {
 				path: "pages/topic/exam",
-				scene: res.id
+				scene: res.id,
+				time,
 			}
 		}
 	})

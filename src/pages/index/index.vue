@@ -1,6 +1,6 @@
 <template>
 	<view class="page-content"
-		:style="{'height':systemInfo.screenHeight+'px','background-image':backgroundImg?'url('+backgroundImg+')':''}">
+		:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
 		<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
 			:style="{'top':systemInfo.statusBarHeight+6+'px'}">
 			<view :class="['line',menuShow?'show':'']"></view>
@@ -16,7 +16,7 @@
 		<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
 		<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
 		<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
-		<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage" @changeBg="changeBackground">
+		<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage">
 		</setting-view>
 		<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
 	</view>
@@ -76,8 +76,6 @@
 			}
 		},
 		created() {
-			let background = uni.getStorageSync('backgroundImage')
-			this.backgroundImg = background
 			this.pageParams = {
 				main: 'main',
 				minor: ''
@@ -90,16 +88,13 @@
 					value: "test"
 				})
 			} else {
-				uni.$once("loginSuccess", () => {
+				uni.$once("userLogin", () => {
 					this.tabList.push({
 						title: "实验室",
 						value: "test"
 					})
 				})
 			}
-		},
-		onShareAppMessage() {
-
 		},
 		methods: {
 			// 切换页面
@@ -119,10 +114,6 @@
 			switchFuc(val) {
 				if (val == 'record') this.$refs.record.refresh()
 				this.switchPage(val)
-			},
-			// 改变背景图
-			changeBackground(url) {
-				this.backgroundImg = url
 			},
 		}
 	}
