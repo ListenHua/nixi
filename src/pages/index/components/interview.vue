@@ -67,7 +67,7 @@
 				labelValue: [],
 				pages: 1,
 				nodata: false,
-				filterShow:false,
+				filterShow: false,
 			}
 		},
 		watch: {
@@ -207,6 +207,7 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
+
 	.filter-pop {
 		position: relative;
 		display: flex;
@@ -263,12 +264,7 @@
 
 		&__block {
 			opacity: 0;
-
-			@for $i from 1 to 99 {
-				&:nth-child(#{$i}) {
-					animation: fade-in-bottom .8s forwards $i*0.1s;
-				}
-			}
+			animation: fade-in-bottom .8s forwards 0.3s;
 		}
 	}
 

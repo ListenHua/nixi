@@ -117,7 +117,7 @@
 				labelValue: [],
 				pages: 1,
 				nodata: false,
-				examInfoPop: false,
+				examInfoPop: true,
 				filterShow: false,
 				selectNum: 0,
 				selectList: [],
@@ -135,6 +135,11 @@
 					id: "",
 				},
 			}
+		},
+		onReachBottom() {
+			if (this.nodata) return
+			this.pages += 1
+			this.getData()
 		},
 		onLoad() {
 			this.getLabel()
@@ -473,12 +478,7 @@
 
 		&__block {
 			opacity: 0;
-
-			@for $i from 1 to 99 {
-				&:nth-child(#{$i}) {
-					animation: fade-in-bottom .8s forwards $i*0.1s;
-				}
-			}
+			animation: fade-in-bottom .8s forwards 0.2s;
 		}
 	}
 
@@ -487,7 +487,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		padding: 0 40rpx;
-
 	}
 
 	.filter-level {

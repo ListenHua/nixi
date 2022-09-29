@@ -89,10 +89,12 @@
 				})
 			} else {
 				uni.$once("userLogin", () => {
-					this.tabList.push({
-						title: "实验室",
-						value: "test"
-					})
+					if (uni.getStorageSync('userInfo').role > 0) {
+						this.tabList.push({
+							title: "实验室",
+							value: "test"
+						})
+					}
 				})
 			}
 		},

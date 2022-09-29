@@ -68,6 +68,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/topic/analysis",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "题目解析",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"subPackages": [],
 	"globalStyle": {

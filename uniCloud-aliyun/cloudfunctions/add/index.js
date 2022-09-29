@@ -3,6 +3,7 @@ const db = uniCloud.database()
 const {
 	verifyToken
 } = require("wx-common");
+const createTime = new Date().getTime()
 exports.main = async (event, context) => {
 	switch (event.action) {
 		case 'addBookInfo': {
@@ -23,11 +24,56 @@ exports.main = async (event, context) => {
 		case 'answerResult': {
 			return answerResult(event.params)
 		}
+		case 'topicAnalysis': {
+			return topicAnalysis(event.params)
+		}
 		default: {
 			return
 		}
 	}
 };
+// 添加题目解析
+async function topicAnalysis(event) {
+	if (!event.token) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	let userInfo = verifyToken(event.token)
+	if (userInfo == 'expired') {
+		return {
+			code: 402,
+			msg: "授权信息过期"
+		}
+	}
+	if (!userInfo) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	const collection = db.collection('topic-analysis')
+	delete event.token
+	event.createTime = createTime
+	/* 
+	 * 帖子状态
+	 * 0 未审核 1 正常显示 2 异常
+	 */
+	console.log(userInfo.userInfo)
+	event.status = userInfo.userInfo.role > 0 ? 1 : 0
+	event.author = {
+		avatar: userInfo.userInfo.avatarUrl,
+		name: userInfo.userInfo.nickName,
+		id: userInfo.userInfo._id
+	}
+	let res = await collection.add(event)
+	return {
+		code: 200,
+		msg: "提交审核成功!",
+		data: ''
+	}
+}
 
 async function answerResult(event) {
 	if (!event.token) {
@@ -53,6 +99,7 @@ async function answerResult(event) {
 	delete event.token
 	event.answerer = userInfo.userInfo
 	event.answererId = userInfo.userInfo._id
+	event.createTime = createTime
 	let res = await collection.add(event)
 	return {
 		code: 200,
@@ -101,7 +148,6 @@ async function createSubject(event) {
 			msg: "请先授权登录用户"
 		}
 	}
-	let time = new Date().getTime()
 	const collection = db.collection('testPaper')
 	let res = await collection.add({
 		title,
@@ -110,7 +156,7 @@ async function createSubject(event) {
 		number,
 		limitTime,
 		endTime,
-		createTime: time,
+		createTime,
 		creator: userInfo.userInfo,
 		creatorId: userInfo.userInfo._id,
 		qrcode: '',
@@ -149,7 +195,8 @@ async function addLabel(event) {
 	} = event
 	const collection = db.collection('labelList')
 	let res = await collection.add({
-		name
+		name,
+		createTime,
 	})
 	return {
 		code: 200,
@@ -167,6 +214,7 @@ async function addVersion(event) {
 		version,
 		versionNum: version.replace(/./g, ""),
 		desc,
+		createTime,
 	})
 	return {
 		code: 200,
@@ -193,6 +241,7 @@ async function addTopic(event) {
 		answer,
 		creater,
 		level,
+		createTime,
 	})
 	return {
 		code: 200,
@@ -217,6 +266,7 @@ async function addBookInfo(event) {
 		title,
 		type,
 		origin,
+		createTime,
 		list: []
 	})
 	console.log(JSON.stringify(res))

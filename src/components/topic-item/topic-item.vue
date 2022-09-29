@@ -1,10 +1,10 @@
 <template>
-	<view class="interview-block" :class="item.wrong?'shake-horizontal':''">
+	<view class="interview-block" :class="item.wrong?'shake-horizontal':''" :style="[customStyle]">
 		<view class="interview-block__info">
 			<text class="interview-block__info__type">「{{item.type===0?'多选':item.type===1?'单选':'问答题'}}」</text>
 			<text class="interview-block__info__tag"
 				:style="{'background-color':item.level===0?'#7bcfa6':item.level===1?'#71a0f8':'#3478F5'}">{{item.level===0?'初级':item.level===1?'中级':'高级'}}</text>
-			<view class="interview-block__info__tag" v-for="(item,index) in tagList">{{item}}</view>
+			<view class="interview-block__info__tag" v-for="(items,index) in item.label">{{items}}</view>
 		</view>
 		<view class="interview-block__title">
 			<uni-parse :content='item.title'></uni-parse>
@@ -36,24 +36,21 @@
 			<template v-if="button.includes('study')">
 				<view class="interview-block__bottom__button" v-if="item.type===2&&!item.show"
 					@click="showAnswer(index)">
-					<image class="interview-block__bottom__icon" src="/static/images/preview-icon.svg"></image>
 					<text>查看答案</text>
 				</view>
 				<view class="interview-block__bottom__button" v-if="item.type!==2" @click="showAnswer(index)">
-					<image class="interview-block__bottom__icon"
-						:src="item.show?'/static/images/correct-icon.svg':'/static/images/preview-icon.svg'">
-					</image>
 					<text>{{item.show?'我的选择':'查看答案'}}</text>
+				</view>
+				<view class="interview-block__bottom__button blue-btn" v-if="item.type!==2" @click="viewAnalysis(item)">
+					<text>查看解析</text>
 				</view>
 			</template>
 			<view v-if="button.includes('join')" class="interview-block__bottom__button green-btn"
 				@click="join(item,index)">
-				<image class="interview-block__bottom__icon" src="/static/images/plus-icon.svg"></image>
 				<text>加入题库</text>
 			</view>
 			<view v-if="button.includes('remove')" class="interview-block__bottom__button red-btn"
 				@click="remove(item,index)">
-				<image class="interview-block__bottom__icon" src="/static/images/close-icon-red.svg"></image>
 				<text>移出题库</text>
 			</view>
 		</view>
@@ -83,6 +80,10 @@
 			answer: {
 				type: Boolean,
 				default: true,
+			},
+			customStyle: {
+				type: [Object, String],
+				default: () => {}
 			}
 		},
 		computed: {
@@ -104,13 +105,17 @@
 		},
 		data() {
 			return {
-				tagList: [],
+
 			};
 		},
-		mounted() {
-			this.tagList = this.item.label.split(',')
-		},
+		mounted() {},
 		methods: {
+			// 查看题目分析
+			viewAnalysis(item) {
+				uni.navigateTo({
+					url: '/pages/topic/analysis?id=' + item._id
+				})
+			},
 			showAnswer(index) {
 				this.$emit('show', index)
 			},
@@ -194,24 +199,27 @@
 			margin-top: 30rpx;
 
 			&__button {
-				border: 2rpx solid #3eb370;
+				background-color: #3eb370;
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				padding: 10rpx 20rpx;
-				border-radius: 16rpx;
-				color: #3eb370;
-				font-size: 24rpx;
+				padding: 12rpx 30rpx;
+				border-radius: 8rpx;
+				color: #fff;
+				font-size: 26rpx;
+				margin-left: 20rpx;
 			}
 
 			.red-btn {
-				border: 2rpx solid #ff3030;
-				color: #ff3030;
+				background-color: #ff3030;
 			}
 
 			.green-btn {
-				border: 2rpx solid #3eb370;
-				color: #3eb370;
+				background-color: #3eb370;
+			}
+
+			.blue-btn {
+				background-color: #71a0f8;
 			}
 
 			&__icon {

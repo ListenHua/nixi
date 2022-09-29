@@ -35,5 +35,6 @@
 		left: 0;
 		width: 100%;
 		z-index: 99;
+		box-shadow: 0 0 24rpx rgba(0, 0, 0, 0.08);
 	}
 </style>
