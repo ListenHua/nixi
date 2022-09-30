@@ -1,24 +1,29 @@
 <template>
-	<view class="page-content"
-		:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
-		<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
-			:style="{'top':systemInfo.statusBarHeight+6+'px'}">
-			<view :class="['line',menuShow?'show':'']"></view>
-			<view :class="['line',menuShow?'show':'']"></view>
-			<view :class="['line',menuShow?'show':'']"></view>
+	<view>
+		<view class="start-page" :class="[pageLoad?'hide-start-page':'']">
+			<image :src="startParams.cover" mode="aspectFill" @click="startClick"></image>
 		</view>
-		<view class="menu-list" :style="{'top':systemInfo.statusBarHeight+40+'px'}">
-			<view v-for="(item,index) in tabList" :class="['block',menuShow?'show':'']" :key="index"
-				@click="switchFuc(item.value)">{{item.title}}
+		<view class="page-content"
+			:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
+			<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
+				:style="{'top':systemInfo.statusBarHeight+6+'px'}">
+				<view :class="['line',menuShow?'show':'']"></view>
+				<view :class="['line',menuShow?'show':'']"></view>
+				<view :class="['line',menuShow?'show':'']"></view>
 			</view>
+			<view class="menu-list" :style="{'top':systemInfo.statusBarHeight+40+'px'}">
+				<view v-for="(item,index) in tabList" :class="['block',menuShow?'show':'']" :key="index"
+					@click="switchFuc(item.value)">{{item.title}}
+				</view>
+			</view>
+			<test-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></test-view>
+			<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
+			<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
+			<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
+			<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage">
+			</setting-view>
+			<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
 		</view>
-		<test-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></test-view>
-		<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
-		<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
-		<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
-		<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage">
-		</setting-view>
-		<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
 	</view>
 </template>
 
@@ -73,6 +78,8 @@
 					},
 				],
 				testData: '',
+				startParams: '',
+				pageLoad: false,
 			}
 		},
 		created() {
@@ -82,6 +89,7 @@
 			}
 		},
 		onLoad() {
+			this.getStartPage()
 			if (uni.getStorageSync('userInfo').role > 0) {
 				this.tabList.push({
 					title: "实验室",
@@ -99,6 +107,28 @@
 			}
 		},
 		methods: {
+			// 点击启动页
+			startClick() {
+				let path = this.startParams.path
+				if (path) {
+					uni.navigateTo({
+						url: path,
+					});
+				}
+			},
+			// 获取启动页
+			getStartPage() {
+				request('get/systemData', {
+					type: 'start-page'
+				}).then(res => {
+					this.startParams = res.data
+					setTimeout(() => {
+						this.pageLoad = true
+					}, 3000)
+				}).catch(res => {
+					this.pageLoad = true
+				})
+			},
 			// 切换页面
 			switchPage(page) {
 				let params = this.pageParams
@@ -122,6 +152,23 @@
 </script>
 
 <style lang="scss" scoped>
+	.hide-start-page {
+		animation: slide-out-bck-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+	}
+
+	.start-page {
+		width: 100%;
+		height: 100vh;
+		position: fixed;
+		z-index: 9999;
+		background-color: #fff;
+
+		image {
+			width: 100%;
+			height: 100%;
+		}
+	}
+
 	.page-content {
 		width: 100%;
 		position: relative;

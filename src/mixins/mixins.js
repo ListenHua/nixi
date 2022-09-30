@@ -1,5 +1,6 @@
 import {
-	login
+	login,
+	request
 } from '@/utils/request'
 const systemInfo = {
 	filters: {
@@ -51,24 +52,25 @@ const systemInfo = {
 	// 	}
 	// },
 	onShareAppMessage() {
-		return {
-			title: this.share.title,
-			path: this.share.path,
-			imageUrl: this.share.imageUrl,
-			desc: this.share.desc,
-			content: this.share.content,
-			success() {
-				uni.showToast({
-					title: '分享成功',
-				})
-			},
-			fail() {
-				uni.showToast({
-					title: '分享失败',
-					icon: 'none',
-				})
-			},
+		let params = uni.getStorageSync('shareParams')
+		if (params) {
+			return {
+				title: params.title,
+				path: params.path,
+				imageUrl: params.imageUrl,
+				desc: params.desc,
+				content: params.content,
+			}
+		} else {
+			return {
+				title: this.share.title,
+				path: this.share.path,
+				imageUrl: this.share.imageUrl,
+				desc: this.share.desc,
+				content: this.share.content,
+			}
 		}
+
 	},
 	methods: {
 

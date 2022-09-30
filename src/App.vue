@@ -1,10 +1,19 @@
 <script>
+	import {
+		request
+	} from '@/utils/request'
 	export default {
 		globalData: {
 			systemInfo: ''
 		},
 		onLaunch: function() {
 			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
+			request('get/systemData', {
+				type: 'share'
+			}).then(res => {
+				let data = res.data
+				uni.setStorageSync('shareParams', data)
+			})
 		},
 		onShow: function() {
 			console.log('App Show')

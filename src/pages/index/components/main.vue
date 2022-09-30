@@ -131,7 +131,7 @@
 			},
 			// 获取用信息
 			async getInfo() {
-				await login()
+				// await login()
 				let info = uni.getStorageSync('userInfo')
 				if (info) {
 					this.userInfo = info

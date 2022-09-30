@@ -2,6 +2,9 @@
 const db = uniCloud.database()
 exports.main = async (event, context) => {
 	switch (event.action) {
+		case 'systemData': {
+			return systemData(event.params)
+		}
 		case 'getBookList': {
 			return getBookList(event.params)
 		}
@@ -35,7 +38,20 @@ exports.main = async (event, context) => {
 	}
 }
 
-
+async function systemData(event) {
+	let cmd = db.command
+	let key = {
+		type: cmd.eq(event.type)
+	}
+	const collection = db.collection('system-data')
+	let res = await collection.where(key).get()
+	let result = res.data[0]
+	return {
+		code: 200,
+		msg: "请求成功",
+		data: result
+	}
+}
 
 async function topicAnalysis(event) {
 	let cmd = db.command
