@@ -75,14 +75,15 @@
 		</u-popup>
 		<u-popup :show="createSuccessPop" bgColor="transparent" @close="closeCreateSuccess" mode="center">
 			<view class="success-pop">
-				<image class="success-pop__code" :src="successInfo.code" mode="widthFix"></image>
-				<u-button color="#3478F5" text="保存二维码" shape="circle" :customStyle="{margin:'40rpx 0'}"
+				<image class="success-pop__code" :src="poster" mode="widthFix"></image>
+				<u-button color="#3478F5" text="保存图片" shape="circle" :customStyle="{margin:'40rpx 0'}"
 					@click="saveCodeImage">
 				</u-button>
 				<image class="success-pop__close" src="/static/images/close-icon-white.svg" mode="widthFix"
 					@click="closeCreateSuccess"></image>
 			</view>
 		</u-popup>
+		<canvas id="qrcode" canvas-id="qrcode" :style="{width: canvasWidth+'px', height: canvasHeight+'px'}"></canvas>
 	</view>
 </template>
 
@@ -134,6 +135,16 @@
 					code: "/static/images/logo.png",
 					id: "",
 				},
+
+				poster: '',
+				code: '',
+				cover: '',
+				avatar: '',
+				codeDesc: '',
+				coverWidth: 0,
+				coverHeight: 0,
+				canvasWidth: 0,
+				canvasHeight: 0,
 			}
 		},
 		onReachBottom() {
@@ -148,29 +159,141 @@
 			this.topicInfo.endTime = dayjs().add(1, 'day').format('YYYY-MM-DD')
 		},
 		methods: {
+			getImageInfo(image, key) {
+				return new Promise((resolve, reject) => {
+					uni.getImageInfo({
+						src: image,
+						success: (res) => {
+							console.log('70--->', res);
+							if (key == 'cover') {
+								this.coverWidth = res.width
+								this.coverHeight = res.height
+							}
+							this[key] = res.path
+							resolve(res)
+						},
+						fail: (res) => {
+							reject(res)
+						}
+					})
+				})
+			},
+			async initQRcode(code) {
+				this.canvasWidth = 670
+				this.canvasHeight = 940
+
+				let coverList = uni.getStorageSync('shareCover').cover
+				let coverIndex = Math.floor((Math.random() * coverList.length))
+				let cover = coverList[coverIndex]
+
+				let descList = uni.getStorageSync('shareCover').desc
+				let descIndex = Math.floor((Math.random() * descList.length))
+				this.codeDesc = descList[descIndex]
+
+				await this.getImageInfo(code, 'code')
+				await this.getImageInfo(cover, 'cover')
+				await this.getImageInfo(uni.getStorageSync('userInfo').avatarUrl, 'avatar')
+				uni.showLoading({
+					title: "生成中...",
+					mask: true
+				})
+				this.initCanvas()
+			},
+			initCanvas() {
+				let userInfo = uni.getStorageSync('userInfo')
+				let width = this.canvasWidth
+				let height = this.canvasHeight
+				var ctx = uni.createCanvasContext('qrcode')
+				// 绘制背景色
+				ctx.fillStyle = "#fff"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.fillRect(0, 0, width, height);
+				// 背景图
+				ctx.save();
+				ctx.beginPath();
+				ctx.rect(0, 0, width, width)
+				ctx.clip();
+				ctx.drawImage(this.cover, 0, 0, width, width / this.coverWidth * this.coverHeight);
+				ctx.restore();
+
+				ctx.drawImage(this.code, width - 180, height - 180, 160, 160)
+				// 标题
+				ctx.fillStyle = "#333"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(30)
+				ctx.save();
+				ctx.fillText(this.topicInfo.title, 20, width + 40);
+				ctx.restore();
+
+				// 用户名字
+				ctx.fillStyle = "#333"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				let name = userInfo.nickName
+				ctx.setFontSize(24)
+				ctx.save();
+				ctx.fillText(name, 152, height - 120);
+				ctx.restore();
+
+				// 用户下的描述
+				ctx.fillStyle = "#666"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(22)
+				ctx.save();
+				ctx.fillText(this.codeDesc, 152, height - 84);
+				ctx.restore();
+
+				// 用户下的描述2
+				ctx.fillStyle = "#999"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(20)
+				ctx.save();
+				ctx.fillText('长按小程序码，识别了解详情>>', 152, height - 52);
+				ctx.restore();
+
+				// 用户头像
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(120 / 2 + 20, 120 / 2 + 784, 120 / 2, 0, Math
+					.PI * 2, false);
+				ctx.clip();
+				ctx.drawImage(this.avatar, 20, 784, 120, 120);
+				ctx.restore();
+
+				ctx.draw(false, () => {
+					this.translateImage()
+				})
+			},
+			translateImage() {
+				uni.canvasToTempFilePath({
+					x: 0,
+					y: 0,
+					width: this.canvasWidth,
+					height: this.canvasHeight,
+					destWidth: this.canvasWidth,
+					destHeight: this.canvasHeight,
+					canvasId: 'qrcode',
+					success: (res) => {
+						console.log('------->', res);
+						this.poster = res.tempFilePath
+						this.createSuccessPop = true
+						uni.hideLoading()
+					},
+					fail: (res) => {
+						console.log('fail----->', res);
+						setTimeout(() => {
+							this.translateImage()
+						}, 300)
+					}
+				})
+			},
+
+
+
 			// 保存二维码
 			saveCodeImage() {
-				uni.getImageInfo({
-					src: this.successInfo.code,
+				uni.saveImageToPhotosAlbum({
+					filePath: this.poster,
 					success: (res) => {
-						let path = res.path;
-						uni.saveImageToPhotosAlbum({
-							filePath: path,
-							success: (res) => {
-								uni.showToast({
-									title: "保存成功!"
-								})
-							},
-							fail: (res) => {
-								uni.showToast({
-									title: "保存失败!",
-									icon: "none"
-								})
-							}
+						uni.showToast({
+							title: "保存成功!"
 						})
 					},
-					fail(res) {
-						console.log(res)
+					fail: (res) => {
 						uni.showToast({
 							title: "保存失败!",
 							icon: "none"
@@ -218,8 +341,7 @@
 						code: shareImg,
 						id,
 					}
-					this.createSuccessPop = true
-					uni.hideLoading()
+					this.initQRcode(shareImg)
 				}).catch(res => {
 					uni.hideLoading()
 					uni.showToast({
@@ -368,6 +490,12 @@
 </script>
 
 <style lang="scss" scoped>
+	#qrcode {
+		position: absolute;
+		top: -1000vh;
+		left: -1000vw;
+	}
+
 	.success-pop {
 		display: flex;
 		flex-direction: column;

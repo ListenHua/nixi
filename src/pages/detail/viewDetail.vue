@@ -40,8 +40,8 @@
 <script>
 	var timer;
 	import uniParse from '@/uni_modules/uni-parse/parse'
- 	export default {
-		components:{
+	export default {
+		components: {
 			uniParse
 		},
 		data() {
@@ -58,10 +58,8 @@
 				autoSaveFunction: "",
 				bookId: '',
 				pageType: '',
+				historyValue: 0,
 			}
-		},
-		created() {
-
 		},
 		onPageScroll(e) {
 			if (this.readHabit == 'scroll') {
@@ -84,6 +82,10 @@
 			this.screenHeight = system.screenHeight - system.statusBarHeight - 44
 			if (option.type == 'history') {
 				this.getHistoryView(option.id)
+			} else if (option.type == 'share') {
+				this.readHabit = option.habit
+				this.historyValue = option.value
+				this.getData(option.id)
 			} else {
 				let readHabit = uni.getStorageSync('readHabit')
 				if (readHabit) {
@@ -97,6 +99,19 @@
 		onUnload() {
 			clearInterval(this.autoSaveFunction)
 		},
+		onShareAppMessage() {
+			let info = this.info
+			let habit = this.readHabit
+			console.log('value————————》', this.viewProgress, this.contentIndex);
+			let value = habit == 'scroll' ? this.viewProgress : this.contentIndex
+			return {
+				title: info.title,
+				path: `pages/detail/viewDetail?id=${info._id}&type=share&habit=${habit}&value=${value}`,
+				imageUrl: info.cover,
+				desc: '',
+				content: '',
+			}
+		},
 		methods: {
 			queryContentHeight() {
 				let that = this
@@ -108,11 +123,9 @@
 					query.select('.page-content').boundingClientRect().exec(function(res) {
 						that.scrollHeight = res[0].height
 					})
-					setTimeout(() => {
-						uni.pageScrollTo({
-							scrollTop: this.historyValue,
-						})
-					}, 200)
+					uni.pageScrollTo({
+						scrollTop: this.historyValue,
+					})
 				}
 			},
 			// 获取浏览记录
@@ -125,6 +138,32 @@
 				this.readHabit = list.read_habit
 				this.historyValue = list.progress_value
 				this.getData(id)
+			},
+			// 获取数据
+			getData(id) {
+				uniCloud.callFunction({
+					name: 'get',
+					data: {
+						action: "getBookContent",
+						params: {
+							id,
+						}
+					}
+				}).then(res => {
+					this.info = res.result.data
+					uni.setNavigationBarTitle({
+						title: this.info.title
+					})
+					uni.showLoading({
+						title:"内容加载中..."
+					})
+					this.$nextTick(() => {
+						uni.hideLoading()
+						setTimeout(() => {
+							this.queryContentHeight()
+						}, 100)
+					})
+				})
 			},
 			// 获取自动保存
 			scrollAutoSave() {
@@ -140,7 +179,7 @@
 					title
 				} = this.info
 				let data = {
-					id:_id,
+					id: _id,
 					cover,
 					author,
 					title
@@ -181,23 +220,6 @@
 					current: index
 				})
 			},
-			// 获取数据
-			getData(id) {
-				uniCloud.callFunction({
-					name: 'get',
-					data: {
-						action: "getBookContent",
-						params: {
-							id,
-						}
-					}
-				}).then(res => {
-					this.info = res.result.data
-					setTimeout(() => {
-						this.queryContentHeight()
-					}, 300)
-				})
-			},
 			// 阅读习惯选择
 			readHabitChose(type) {
 				uni.setStorageSync('readHabit', type)
@@ -214,8 +236,6 @@
 </script>
 
 <style lang="scss">
-	
-	
 	.page-content {
 		.progress-box {
 			position: fixed;

@@ -14,6 +14,12 @@
 				let data = res.data
 				uni.setStorageSync('shareParams', data)
 			})
+			request('get/systemData', {
+				type: 'share-cover'
+			}).then(res => {
+				let data = res.data
+				uni.setStorageSync('shareCover', data)
+			})
 		},
 		onShow: function() {
 			console.log('App Show')

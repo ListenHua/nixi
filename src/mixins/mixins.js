@@ -31,33 +31,33 @@ const systemInfo = {
 			console.log("刷新用户信息");
 		})
 	},
-	// onShareTimeline() {
-	// 	return {
-	// 		title: this.share.title,
-	// 		path: this.share.path + '?sid=' + this.share.sid,
-	// 		imageUrl: this.share.imageUrl,
-	// 		desc: this.share.desc,
-	// 		content: this.share.content,
-	// 		success() {
-	// 			uni.showToast({
-	// 				title: '分享成功',
-	// 			})
-	// 		},
-	// 		fail() {
-	// 			uni.showToast({
-	// 				title: '分享失败',
-	// 				icon: 'none',
-	// 			})
-	// 		},
-	// 	}
-	// },
+	onShareTimeline() {
+		let params = uni.getStorageSync('shareParams')
+		if (params) {
+			return {
+				title: params.circleTitle,
+				desc: params.desc,
+				imageUrl: this.share.circleImage,
+				content: params.content,
+			}
+		} else {
+			return {
+				title: this.share.title,
+				desc: this.share.desc,
+				content: this.share.content,
+			}
+		}
+	},
 	onShareAppMessage() {
 		let params = uni.getStorageSync('shareParams')
+		let coverList = params.imageUrl
+		let coverIndex = Math.floor((Math.random() * coverList.length))
+		let cover = coverList[coverIndex]
 		if (params) {
 			return {
 				title: params.title,
 				path: params.path,
-				imageUrl: params.imageUrl,
+				imageUrl: cover,
 				desc: params.desc,
 				content: params.content,
 			}
