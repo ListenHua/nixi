@@ -40,9 +40,6 @@
 <script>
 	import topicItem from '@/components/topic-item/topic-item'
 	import dayjs from 'dayjs'
-	import {
-		request
-	} from '@/utils/request.js'
 	export default {
 		components: {
 			topicItem
@@ -78,7 +75,7 @@
 			},
 			// 获取解析数据
 			getAnalysisList() {
-				request('get/topicAnalysis', {
+				this.$http.request('get/topicAnalysis', {
 					page: this.pages,
 					id: this.id
 				}).then(res => {
@@ -105,7 +102,7 @@
 					id: this.id,
 					content: this.analysisContent
 				}
-				request('add/topicAnalysis', params).then(res => {
+				this.$http.request('add/topicAnalysis', params).then(res => {
 					this.inputPop = false
 					this.analysisContent = ''
 					uni.showToast({
@@ -123,7 +120,7 @@
 			},
 			// 获取数据
 			getData() {
-				request('get/getTopicInfo', {
+				this.$http.request('get/getTopicInfo', {
 					id: this.id
 				}).then(res => {
 					let data = res.data

@@ -13,6 +13,7 @@
 				<topic-item :item='item' :index="index" @show="showAnswer" @select="selectAnswer"></topic-item>
 			</view>
 		</view>
+		<image class="add-btn" src="/static/images/add-icon.svg" mode="aspectFill" @click="createTopic"></image>
 		<u-divider v-if="nodata" text="已经到底了" :customStyle="{padding:'40rpx 60rpx'}"></u-divider>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
@@ -35,9 +36,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	import topicItem from '@/components/topic-item/topic-item'
 	import mixin from './mixins.js'
 	export default {
@@ -80,6 +78,12 @@
 			},
 		},
 		methods: {
+			// 生成面试题
+			createTopic() {
+				uni.navigateTo({
+					url: '/pages/topic/create'
+				})
+			},
 			// 滚动到底部
 			loadingData() {
 				if (this.nodata) return
@@ -131,7 +135,7 @@
 			},
 			// 获取标签
 			getLabel() {
-				request('get/getLabelList').then(res => {
+				this.$http.request('get/getLabelList').then(res => {
 					this.labelList = res.data.map(item => {
 						item.check = false
 						return item
@@ -178,7 +182,7 @@
 					level: this.levelValue,
 					label: this.labelValue
 				}
-				request('get/getTopicList', params).then(res => {
+				this.$http.request('get/getTopicList', params).then(res => {
 					let list = res.data
 					list.forEach(item => {
 						item.show = false
@@ -207,7 +211,13 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
-
+	.add-btn{
+		width: 60rpx;
+		height: 60rpx;
+		position: fixed;
+		right: 20rpx;
+		bottom: 30rpx;
+	}
 	.filter-pop {
 		position: relative;
 		display: flex;

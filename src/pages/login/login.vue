@@ -27,9 +27,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	export default {
 		data() {
 			return {
@@ -55,7 +52,7 @@
 					success: (res) => {
 						let params = res.userInfo
 						params.code = this.loginCode
-						request('user/authUserInfo', params).then(result => {
+						this.$http.request('user/authUserInfo', params).then(result => {
 							uni.setStorageSync('token', result.data.token)
 							uni.setStorageSync('userInfo', result.data.userInfo)
 							that.$refs.uToast.show({

@@ -6,12 +6,16 @@
 			<view class="user-info">
 				<view class="welcome-text">
 					<view class="text">Welcome,</view>
-					<view class="name text-focus-in" v-if="isLogin">{{userInfo.nickName}}</view>
-					<view class="login-text" v-else @click="toLogin">点击登录</view>
+					<view class="name text-focus-in" v-if="isLogin" @click="navigateTo('/pages/mine/user-center')">
+						{{userInfo.nickName}}
+					</view>
+					<view class="login-text" v-else @click="getInfo">点击登录</view>
 				</view>
-				<image v-if="isLogin" class="avatar shadow-drop-center" :src="userInfo.avatarUrl" @click="updateInfo">
+				<image v-if="isLogin" class="avatar shadow-drop-center" :src="userInfo.avatarUrl" mode="aspectFill"
+					@click="navigateTo('/pages/mine/user-center')">
 				</image>
-				<image v-else class="avatar shadow-drop-center" src="/static/images/logo.png" @click="toLogin"></image>
+				<image v-else class="avatar shadow-drop-center" src="/static/images/logo.png" mode="aspectFill"
+					@click="getInfo"></image>
 			</view>
 			<!-- 资料库 -->
 			<view class="info-block" style="overflow: hidden;">
@@ -45,10 +49,6 @@
 </template>
 
 <script>
-	import {
-		login,
-		request
-	} from '@/utils/request.js'
 	import topicItem from '@/components/topic-item/topic-item'
 	import mixin from './mixins.js'
 	export default {
@@ -71,17 +71,20 @@
 			},
 		},
 		mounted() {
-			console.log("加载main")
-			uni.$once('loginSuccess', () => {
+			uni.$off('refreshUserInfo')
+			uni.$on('refreshUserInfo', () => {
 				this.getInfo()
 			})
+			console.log("加载main")
 			this.getInfo()
+			this.getTopicList()
+			this.getBookList()
 			this.checkPage()
 		},
 		methods: {
 			// 更新用户信息
 			updateInfo() {
-				login()
+				this.$http._login()
 				let info = uni.getStorageSync('userInfo')
 				if (info) {
 					this.userInfo = info
@@ -131,20 +134,16 @@
 			},
 			// 获取用信息
 			async getInfo() {
-				// await login()
-				let info = uni.getStorageSync('userInfo')
-				if (info) {
-					this.userInfo = info
+				this.$http.request('user/getInfo').then(res => {
+					this.userInfo = res.data
 					this.isLogin = true
-					uni.$emit("userLogin")
-				}
-				this.getTopicList()
-				this.getBookList()
+					uni.setStorageSync('userInfo', res.data)
+				})
 			},
 			// 获取推荐资料库
 			getBookList() {
 				this.bookList = []
-				request('get/getBookList', {
+				this.$http.request('get/getBookList', {
 					random: true,
 					size: 3
 				}).then(res => {
@@ -155,7 +154,7 @@
 			// 获取题库
 			getTopicList() {
 				this.topicData = {}
-				request('get/getTopicList', {
+				this.$http.request('get/getTopicList', {
 					random: true
 				}).then(res => {
 					let list = res.data

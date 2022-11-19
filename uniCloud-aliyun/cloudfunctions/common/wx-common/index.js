@@ -10,6 +10,7 @@ function getToken(userInfo) {
 		expiresIn: 60 * 60 * 24 * 30
 	});
 }
+
 //解密token
 function verifyToken(token) {
 	return jwt.verify(token, appSecret, (err, decode) => {
@@ -24,9 +25,34 @@ function verifyToken(token) {
 	})
 }
 
+// 验证token
+function verifyInfo(token) {
+	if (!token) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	let userInfo = verifyToken(token)
+	if (userInfo == 'expired') {
+		return {
+			code: 402,
+			msg: "授权信息过期"
+		}
+	}
+	if (!userInfo) {
+		return {
+			code: 401,
+			msg: "请先授权登录用户"
+		}
+	}
+	return userInfo.userInfo
+}
+
 module.exports = {
 	getToken,
 	verifyToken,
 	appId,
-	appSecret
+	appSecret,
+	verifyInfo
 }

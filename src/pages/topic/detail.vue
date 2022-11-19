@@ -5,9 +5,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	export default {
 		data() {
 			return {
@@ -32,7 +29,7 @@
 					limit: this.topic.length,
 					topic: this.topic
 				}
-				request('get/getTopicList', params).then(res => {
+				this.$http.request('get/getTopicList', params).then(res => {
 					console.log(res);
 
 				})

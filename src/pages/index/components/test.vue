@@ -2,9 +2,11 @@
 	<scroll-view scroll-y :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
-		<view class="cell-group">
-			<u-cell title="生成面试题" :border="false" @click="createTopic"></u-cell>
-		</view>
+		<!-- <view class="cell-group">
+			<u-cell title="提交的考卷" :border="false" @click="viewMyReply"></u-cell>
+		</view> -->
+		<u-empty mode="data" text="暂无新功能可以体验" icon="http://cdn.uviewui.com/uview/empty/data.png">
+		</u-empty>
 		<view class="desc-text">
 			<image src="/static/images/logo.png"></image>
 			<text>Nixi Test</text>
@@ -34,9 +36,9 @@
 			this.checkPage()
 		},
 		methods: {
-			createTopic(){
+			viewMyReply() {
 				uni.navigateTo({
-					url:'/pages/topic/create'
+					url: '/pages/mine/exam-reply'
 				})
 			},
 		}

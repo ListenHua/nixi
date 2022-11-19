@@ -13,7 +13,7 @@
 				<view class="author">{{item.author}}</view>
 			</view>
 		</view>
-		<view v-if="searchOver&&bookList.length==0" class="placeholder-block">
+		<view v-if="searchOver&&bookList.length==0" class="nodata-block">
 			<image class="icon" src="/static/images/nodata.svg"></image>
 			<text class="text">未搜索到相关内容</text>
 		</view>
@@ -156,7 +156,7 @@
 
 	}
 
-	.placeholder-block {
+	.nodata-block {
 		padding: 50rpx;
 		display: flex;
 		justify-content: center;

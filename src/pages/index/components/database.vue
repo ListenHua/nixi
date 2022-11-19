@@ -19,9 +19,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from "@/utils/request.js"
 	import mixin from './mixins.js'
 	export default {
 		name: "database",
@@ -65,7 +62,7 @@
 				uni.showLoading({
 					title: "数据加载中..."
 				})
-				request('get/getBookList').then(res => {
+				this.$http.request('get/getBookList').then(res => {
 					uni.hideLoading()
 					let list = res.data
 					for (let i in list) {

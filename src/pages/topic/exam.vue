@@ -1,6 +1,6 @@
 <template>
-	<view class="exam-page">
-		<template v-if="isLogin&&examShow">
+	<view class="exam-page" v-if="examShow">
+		<template>
 			<u-sticky v-if="examInfo.limitTime>0">
 				<view class="exam-time">
 					<view class="exam-time__process" :style="{'width':`${surplusTime/(examInfo.limitTime*60)*100}%`}">
@@ -28,21 +28,41 @@
 				</view>
 			</n-bottom>
 		</template>
-		<u-modal :show="loginPop" title="未登录" content='需要登录才能查看试题噢😀' confirmText="去登陆" @confirm="toLogin"></u-modal>
+		<view class="float-btn">
+			<image src="/static/images/answer-user-icon.svg" mode="aspectFill" @click="answerInfoPop=true"></image>
+		</view>
 		<u-modal :show="resultPop" title="您的成绩是:" confirmText="我知道了" @confirm="resultPop=false">
 			<view class="score-box">
 				<view>总题数：{{interviewList.length}}</view>
 				<view>答对数：{{score}}</view>
 			</view>
 		</u-modal>
+		<u-popup :show="answerInfoPop" mode="center" round="16" @close="answerInfoPop=false">
+			<view class="answer-info">
+				<view class="answer-info__title">回答者信息</view>
+				<view class="answer-info__block">
+					<text class="answer-info__block__title">昵称(ID)：</text>
+					<text class="answer-info__block__text">{{answererInfo.nickName}}({{answererInfo.id}})</text>
+				</view>
+				<view class="answer-info__block">
+					<text class="answer-info__block__title">回答时间：</text>
+					<text class="answer-info__block__time">{{answerTime}}</text>
+				</view>
+				<view class="answer-info__block">
+					<text class="answer-info__block__title">答对：</text>
+					<text class="answer-info__block__right">{{score}}</text>
+				</view>
+				<view class="answer-info__block">
+					<text class="answer-info__block__title">答错：</text>
+					<text class="answer-info__block__wrong">{{interviewList.length-score}}</text>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
 <script>
 	import topicItem from '@/components/topic-item/topic-item'
-	import {
-		request
-	} from '@/utils/request.js'
 	import dayjs from 'dayjs'
 	export default {
 		components: {
@@ -55,34 +75,53 @@
 				interviewList: [],
 				surplusTime: 0,
 				surplusTimeInterval: '',
-				loginPop: false,
 				isAnswerAll: false, // 是否已全部答题
 				unAnswerTopicId: '',
 				scrollTop: 0,
-				isLogin: false,
 				answerOver: false,
 				resultPop: false,
 				score: 0,
 				examShow: false,
-			}
-		},
-		onShow() {
-			if (uni.getStorageSync('userInfo').nickName) {
-				this.loginPop = false
-				this.getExamDetail()
-				this.isLogin = true
-			} else {
-				this.loginPop = true
-				this.isLogin = false
+
+				pageType: 0,
+				answererInfo: '',
+				answerTime: '',
+				answerInfoPop: false,
 			}
 		},
 		onLoad(option) {
-			this.examId = option.scene
+			if (option.scene) {
+				this.examId = option.scene
+			}
+			if (option.id) {
+				this.examId = option.id
+			}
+			if (option.type == 'answered') {
+				this.pageType = 1
+				this.getAnsweredDetail()
+			} else {
+				this.getExamDetail()
+			}
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop
 		},
 		methods: {
+			getAnsweredDetail() {
+				let params = {
+					id: this.examId
+				}
+				this.$http.request('get/getReplyDetail', params).then(res => {
+					let data = res.data
+					this.examShow = true
+					this.answerOver = true
+					this.examInfo = data.info
+					this.score = data.score
+					this.interviewList = data.topic
+					this.answererInfo = data.answerer
+					this.answerTime = dayjs(data.createTime).format('YYYY-MM-DD HH:mm:ss')
+				})
+			},
 			// 显示答案
 			showAnswer(index) {
 				console.log("show------>", index);
@@ -114,7 +153,7 @@
 				let params = {
 					id: this.examId
 				}
-				request('get/getExamDetail', params).then(res => {
+				this.$http.request('get/getExamDetail', params).then(res => {
 						console.log(res);
 						if (res.data.endTime < dayjs().format("YYYY-MM-DD")) {
 							uni.showToast({
@@ -225,7 +264,7 @@
 					score: this.score,
 					topic: this.interviewList
 				}
-				request('add/answerResult', params).then(res => {
+				this.$http.request('add/answerResult', params).then(res => {
 					console.log(res);
 					this.answerOver = true
 					this.resultPop = true
@@ -267,7 +306,66 @@
 </script>
 
 <style scoped lang="scss">
+	.float-btn {
+		width: 68rpx;
+		height: 68rpx;
+		position: fixed;
+		right: 30rpx;
+		bottom: 40rpx;
+
+		image {
+			width: 68rpx;
+			height: 68rpx;
+		}
+	}
+
 	.exam-page {
+		.answer-info {
+			padding: 30rpx;
+			width: 640rpx;
+			height: 500rpx;
+			box-shadow: 0 0 12rpx rgba(0, 0, 0, 0.08);
+			box-sizing: border-box;
+
+			&__title {
+				width: 100%;
+				text-align: center;
+				font-size: 32rpx;
+				font-weight: bold;
+				margin-bottom: 50rpx
+			}
+
+			&__block {
+				margin-bottom: 20rpx;
+				display: flex;
+				align-items: center;
+
+				&__title {
+					width: 200rpx;
+					text-align: end;
+					font-size: 30rpx;
+				}
+
+				&__text {
+					font-size: 28rpx;
+					white-space: nowrap;
+				}
+
+				&__time {
+					color: #999;
+					font-size: 28rpx;
+				}
+
+				&__right {
+					color: #35B128;
+				}
+
+				&__wrong {
+					color: #ff3b20;
+				}
+			}
+		}
+
 		.exam-time {
 			width: 100%;
 			height: 10rpx;

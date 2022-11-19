@@ -283,7 +283,7 @@
 					font-size: 36rpx;
 					font-weight: bold;
 					padding: 30rpx 0;
-					border-bottom: 2rpx solid #eee;
+					border-bottom: 2rpx solid #ccc;
 					margin-bottom: 30rpx;
 					word-break: break-all;
 				}

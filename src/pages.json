@@ -77,6 +77,33 @@
             }
             
         }
+        ,{
+            "path" : "pages/mine/exam-reply",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "考卷",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/mine/user-center",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/mine/edit-info",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"subPackages": [],
 	"globalStyle": {

@@ -9,7 +9,13 @@
 		</view>
 		<view class="cell-group">
 			<u-cell title="版本描述" @click="jumpUrl('/pages/public/version')"></u-cell>
-			<u-cell :border="false" title="关于我们" @click="jumpUrl('/pages/public/about')"></u-cell>
+			<u-cell title="关于我们" @click="jumpUrl('/pages/public/about')"></u-cell>
+			<u-cell :border="false">
+				<view slot="title" class="cell-text">
+					<text>联系客服</text>
+					<button open-type="contact"></button>
+				</view>
+			</u-cell>
 		</view>
 		<view class="desc-text">
 			<image src="/static/images/logo.png"></image>
@@ -22,9 +28,6 @@
 
 <script>
 	import mixin from './mixins.js'
-	import {
-		request
-	} from '@/utils/request'
 	export default {
 		name: "setting",
 		mixins: [mixin],
@@ -79,7 +82,7 @@
 							cloudPath: fileName,
 							filePath,
 						}).then(res => {
-							request('edit/updateBackground', {
+							this.$http.request('edit/updateBackground', {
 								background: res.fileID
 							}).then(() => {
 								this.$refs.uToast.show({
@@ -100,7 +103,7 @@
 					content: "是否要删除当前背景图?",
 					success(res) {
 						if (res.confirm) {
-							request('edit/updateBackground', {
+							this.$http.request('edit/updateBackground', {
 								background: ''
 							}).then(res => {
 								that.$refs.uToast.show({
@@ -121,6 +124,26 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
+
+	.cell-text {
+		position: relative;
+
+		text {
+			font-size: 30rpx;
+			line-height: 44rpx;
+			color: #303133;
+		}
+
+		button {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			outline: none;
+			opacity: 0;
+		}
+	}
 
 	.view-content {
 		background-color: #f8f8f8;

@@ -1,5 +1,8 @@
 'use strict';
 const db = uniCloud.database()
+const {
+	verifyInfo
+} = require("wx-common");
 exports.main = async (event, context) => {
 	switch (event.action) {
 		case 'systemData': {
@@ -32,9 +35,67 @@ exports.main = async (event, context) => {
 		case 'topicAnalysis': {
 			return topicAnalysis(event.params)
 		}
+		case 'getExamReply': {
+			return getExamReply(event.params)
+		}
+		case 'getReplyDetail': {
+			return getReplyDetail(event.params)
+		}
 		default: {
 			return
 		}
+	}
+}
+
+// 获取考卷详情
+async function getReplyDetail(event) {
+	let userInfo = verifyInfo(event.token)
+	let {
+		id
+	} = event
+	const history = db.collection('answerHistory')
+	let res = await history.doc(id).get()
+	if (res.data.length <= 0) {
+		return {
+			code: 300,
+			msg: "找不到该试卷",
+		}
+	}
+	let result = res.data[0]
+	console.log('answerHistory',result);
+	return {
+		code: 200,
+		msg: "请求成功",
+		data: result
+	}
+}
+
+// 获取收到的考卷
+async function getExamReply(event) {
+	let cmd = db.command
+	let limit = event.limit ? event.limit : 15
+	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
+	let start = page * limit
+	let userInfo = verifyInfo(event.token)
+	if (userInfo.code) return userInfo
+	const collection = db.collection('answerHistory')
+	delete event.token
+	console.log(userInfo._id)
+	let key = {
+		info: {
+			creator: {
+				_id: cmd.eq(userInfo._id)
+			}
+		}
+	}
+	let res = await collection.where(key).skip(start).limit(limit).get()
+	let total = await collection.where(key).count()
+	let result = res.data
+	return {
+		code: 200,
+		msg: "请求成功",
+		total: total.total,
+		data: result
 	}
 }
 
@@ -86,7 +147,7 @@ async function getExamDetail(event) {
 	console.log(res);
 	if (res.data.length <= 0) {
 		return {
-			code: 400,
+			code: 300,
 			msg: "找不到该试卷",
 		}
 	}

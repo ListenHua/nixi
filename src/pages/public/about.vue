@@ -5,9 +5,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	import uniParse from '@/uni_modules/uni-parse/parse'
  	export default {
 		components:{
@@ -23,7 +20,7 @@
 		},
 		methods: {
 			getData() {
-				request('get/getAbout').then(res => {
+				this.$http.request('get/getAbout').then(res => {
 					this.content = res.data
 				})
 			},

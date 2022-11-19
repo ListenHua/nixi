@@ -28,9 +28,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	import DatabaseView from './components/database.vue'
 	import SettingView from './components/setting.vue'
 	import RecordView from './components/record.vue'
@@ -118,7 +115,7 @@
 			},
 			// 获取启动页
 			getStartPage() {
-				request('get/systemData', {
+				this.$http.request('get/systemData', {
 					type: 'start-page'
 				}).then(res => {
 					this.startParams = res.data

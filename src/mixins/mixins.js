@@ -1,7 +1,3 @@
-import {
-	login,
-	request
-} from '@/utils/request'
 const systemInfo = {
 	filters: {
 
@@ -24,12 +20,6 @@ const systemInfo = {
 		this.userInfo = uni.getStorageSync('userInfo')
 	},
 	onLoad() {
-		uni.$off('refreshUserInfo')
-		uni.$on('refreshUserInfo', async () => {
-			await login()
-			this.userInfo = uni.getStorageSync('userInfo')
-			console.log("刷新用户信息");
-		})
 	},
 	onShareTimeline() {
 		let params = uni.getStorageSync('shareParams')
@@ -73,7 +63,17 @@ const systemInfo = {
 
 	},
 	methods: {
-
+		toast(msg, icon = 'none') {
+			uni.showToast({
+				title: msg,
+				icon,
+			})
+		},
+		navigateTo(url) {
+			uni.navigateTo({
+				url
+			})
+		},
 	}
 }
 

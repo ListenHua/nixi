@@ -89,9 +89,6 @@
 
 <script>
 	import topicItem from '@/components/topic-item/topic-item'
-	import {
-		request
-	} from '@/utils/request.js'
 	import dayjs from 'dayjs'
 	export default {
 		components: {
@@ -332,7 +329,7 @@
 					title: "生成中...",
 					mask: true
 				})
-				request('add/createSubject', params).then(res => {
+				this.$http.request('add/createSubject', params).then(res => {
 					let {
 						shareImg,
 						id
@@ -459,7 +456,7 @@
 			},
 			// 获取标签
 			getLabel() {
-				request('get/getLabelList').then(res => {
+				this.$http.request('get/getLabelList').then(res => {
 					this.labelList = res.data.map(item => {
 						item.check = false
 						return item
@@ -474,7 +471,7 @@
 					level: this.levelValue,
 					label: this.labelValue
 				}
-				request('get/getTopicList', params).then(res => {
+				this.$http.request('get/getTopicList', params).then(res => {
 					let list = res.data
 					list.forEach(item => {
 						this.interviewList.push(item)

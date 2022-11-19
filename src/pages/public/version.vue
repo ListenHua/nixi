@@ -12,9 +12,6 @@
 </template>
 
 <script>
-	import {
-		request
-	} from '@/utils/request.js'
 	import uniParse from '@/uni_modules/uni-parse/parse'
  	export default {
 		components:{
@@ -30,7 +27,7 @@
 		},
 		methods: {
 			getData() {
-				request('get/getVersion').then(res => {
+				this.$http.request('get/getVersion').then(res => {
 					this.versionList = res.data.reverse()
 				})
 			},
