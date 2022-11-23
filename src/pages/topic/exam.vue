@@ -10,6 +10,8 @@
 			<view class="exam-title">
 				<text v-if="examInfo.limitTime>0">({{examInfo.limitTime}}分钟)</text>
 				<text>{{examInfo.title}}</text>
+				<image v-if="pageType!=0" src="/static/images/delete-icon.png" mode="heightFix" @click="deleteHistory">
+				</image>
 				<u-line margin="40rpx 0 0 0"></u-line>
 			</view>
 			<view class="exam-list">
@@ -28,8 +30,11 @@
 				</view>
 			</n-bottom>
 		</template>
-		<view class="float-btn">
-			<image src="/static/images/answer-user-icon.svg" mode="aspectFill" @click="answerInfoPop=true"></image>
+		<view class="float-btn" v-if="pageType==1">
+			<image src="/static/images/answer-user-icon.png" mode="aspectFill" @click="answerInfoPop=true"></image>
+		</view>
+		<view class="float-btn" v-if="pageType==2">
+			<image src="/static/images/qrcode-icon.png" mode="aspectFill" @click="initQRcode"></image>
 		</view>
 		<u-modal :show="resultPop" title="您的成绩是:" confirmText="我知道了" @confirm="resultPop=false">
 			<view class="score-box">
@@ -37,6 +42,7 @@
 				<view>答对数：{{score}}</view>
 			</view>
 		</u-modal>
+		<!-- 答题者信息 -->
 		<u-popup :show="answerInfoPop" mode="center" round="16" @close="answerInfoPop=false">
 			<view class="answer-info">
 				<view class="answer-info__title">回答者信息</view>
@@ -58,6 +64,19 @@
 				</view>
 			</view>
 		</u-popup>
+		<!-- 分享海报 -->
+		<u-popup :show="createSuccessPop" bgColor="transparent" @close="createSuccessPop = false" mode="center">
+			<view class="success-pop">
+				<image class="success-pop__code" :src="poster" mode="widthFix"></image>
+				<u-button color="#3478F5" text="保存图片" shape="circle" :customStyle="{margin:'40rpx 0'}"
+					@click="saveCodeImage">
+				</u-button>
+				<image class="success-pop__close" src="/static/images/close-icon-white.svg" mode="widthFix"
+					@click="createSuccessPop = false"></image>
+			</view>
+		</u-popup>
+		<canvas id="qrcode" canvas-id="qrcode" :style="{width: canvasWidth+'px', height: canvasHeight+'px'}"></canvas>
+
 	</view>
 </template>
 
@@ -87,6 +106,18 @@
 				answererInfo: '',
 				answerTime: '',
 				answerInfoPop: false,
+
+				createSuccessPop: false,
+				poster: '',
+				code: '',
+				cover: '',
+				avatar: '',
+				codeDesc: '',
+				coverWidth: 0,
+				coverHeight: 0,
+				canvasWidth: 0,
+				canvasHeight: 0,
+
 			}
 		},
 		onLoad(option) {
@@ -99,6 +130,10 @@
 			if (option.type == 'answered') {
 				this.pageType = 1
 				this.getAnsweredDetail()
+			} else if (option.type == 'view') {
+				this.pageType = 2
+				this.getExamDetail()
+				this.answerOver = true
 			} else {
 				this.getExamDetail()
 			}
@@ -107,6 +142,31 @@
 			this.scrollTop = e.scrollTop
 		},
 		methods: {
+			// 删除答题记录
+			deleteHistory() {
+				uni.showModal({
+					title: "提示",
+					content: this.pageType == 1 ? "是否要删除该答题记录" : "是否要删除该试卷",
+					success: (res) => {
+						if (res.confirm) {
+							let url = this.pageType == 1 ? 'remove/answerHistory' : 'remove/myExam'
+							this.$http.request(url, {
+								id: this.examId
+							}).then(res => {
+								this.toast(res.msg, 'success')
+								setTimeout(() => {
+									this.navigaBack()
+									if (this.pageType == 1) {
+										uni.$emit('examReply')
+									} else if (this.pageType == 2) {
+										uni.$emit('myExam')
+									}
+								}, 1500)
+							})
+						}
+					}
+				})
+			},
 			getAnsweredDetail() {
 				let params = {
 					id: this.examId
@@ -155,7 +215,7 @@
 				}
 				this.$http.request('get/getExamDetail', params).then(res => {
 						console.log(res);
-						if (res.data.endTime < dayjs().format("YYYY-MM-DD")) {
+						if (res.data.endTime < dayjs().format("YYYY-MM-DD") && this.pageType == 0) {
 							uni.showToast({
 								title: "该试卷已过期😟",
 								icon: "none"
@@ -301,11 +361,183 @@
 						.exec()
 				})
 			},
+			/* 
+			 * 创建海报分享图
+			 */
+			// 获取图片信息
+			getImageInfo(image, key) {
+				return new Promise((resolve, reject) => {
+					uni.getImageInfo({
+						src: image,
+						success: (res) => {
+							console.log('70--->', res);
+							if (key == 'cover') {
+								this.coverWidth = res.width
+								this.coverHeight = res.height
+							}
+							this[key] = res.path
+							resolve(res)
+						},
+						fail: (res) => {
+							reject(res)
+						}
+					})
+				})
+			},
+			// 初始化分享图的数据
+			async initQRcode() {
+				if (this.poster) {
+					this.createSuccessPop = true
+					return
+				}
+				this.canvasWidth = 670
+				this.canvasHeight = 940
+
+				let coverList = uni.getStorageSync('shareCover').cover
+				let coverIndex = Math.floor((Math.random() * coverList.length))
+				let cover = coverList[coverIndex]
+
+				let descList = uni.getStorageSync('shareCover').desc
+				let descIndex = Math.floor((Math.random() * descList.length))
+				this.codeDesc = descList[descIndex]
+
+				await this.getImageInfo(this.examInfo.qrcode, 'code')
+				await this.getImageInfo(cover, 'cover')
+				await this.getImageInfo(uni.getStorageSync('userInfo').avatarUrl, 'avatar')
+				uni.showLoading({
+					title: "生成中...",
+					mask: true
+				})
+				this.initCanvas()
+			},
+			// 开始绘图
+			initCanvas() {
+				let userInfo = uni.getStorageSync('userInfo')
+				let width = this.canvasWidth
+				let height = this.canvasHeight
+				var ctx = uni.createCanvasContext('qrcode')
+				// 绘制背景色
+				ctx.fillStyle = "#fff"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.fillRect(0, 0, width, height);
+				// 背景图
+				ctx.save();
+				ctx.beginPath();
+				ctx.rect(0, 0, width, width)
+				ctx.clip();
+				ctx.drawImage(this.cover, 0, 0, width, width / this.coverWidth * this.coverHeight);
+				ctx.restore();
+
+				ctx.drawImage(this.code, width - 180, height - 180, 160, 160)
+				// 标题
+				ctx.fillStyle = "#333"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(30)
+				ctx.save();
+				ctx.fillText(this.examInfo.title, 20, width + 40);
+				ctx.restore();
+
+				// 用户名字
+				ctx.fillStyle = "#333"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				let name = userInfo.nickName
+				ctx.setFontSize(24)
+				ctx.save();
+				ctx.fillText(name, 152, height - 120);
+				ctx.restore();
+
+				// 用户下的描述
+				ctx.fillStyle = "#666"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(22)
+				ctx.save();
+				ctx.fillText(this.codeDesc, 152, height - 84);
+				ctx.restore();
+
+				// 用户下的描述2
+				ctx.fillStyle = "#999"; // 设置或返回用于填充绘画的颜色、渐变或模式
+				ctx.setFontSize(20)
+				ctx.save();
+				ctx.fillText('长按小程序码，识别了解详情>>', 152, height - 52);
+				ctx.restore();
+
+				// 用户头像
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(120 / 2 + 20, 120 / 2 + 784, 120 / 2, 0, Math
+					.PI * 2, false);
+				ctx.clip();
+				ctx.drawImage(this.avatar, 20, 784, 120, 120);
+				ctx.restore();
+
+				ctx.draw(false, () => {
+					this.translateImage()
+				})
+			},
+			// 把canvas转成图片
+			translateImage() {
+				uni.canvasToTempFilePath({
+					x: 0,
+					y: 0,
+					width: this.canvasWidth,
+					height: this.canvasHeight,
+					destWidth: this.canvasWidth,
+					destHeight: this.canvasHeight,
+					canvasId: 'qrcode',
+					success: (res) => {
+						console.log('------->', res);
+						this.poster = res.tempFilePath
+						this.createSuccessPop = true
+						uni.hideLoading()
+					},
+					fail: (res) => {
+						console.log('fail----->', res);
+						setTimeout(() => {
+							this.translateImage()
+						}, 300)
+					}
+				})
+			},
+			// 保存二维码
+			saveCodeImage() {
+				uni.saveImageToPhotosAlbum({
+					filePath: this.poster,
+					success: (res) => {
+						uni.showToast({
+							title: "保存成功!"
+						})
+					},
+					fail: (res) => {
+						uni.showToast({
+							title: "保存失败!",
+							icon: "none"
+						})
+					}
+				})
+			},
 		}
 	}
 </script>
 
 <style scoped lang="scss">
+	#qrcode {
+		position: absolute;
+		top: -1000vh;
+		left: -1000vw;
+	}
+
+	.success-pop {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		&__code {
+			width: 70vw;
+			border-radius: 20rpx;
+		}
+
+		&__close {
+			width: 60rpx;
+		}
+	}
+
 	.float-btn {
 		width: 68rpx;
 		height: 68rpx;
@@ -396,6 +628,13 @@
 			font-size: 36rpx;
 			font-weight: bold;
 			padding: 40rpx;
+
+			image {
+				height: 40rpx;
+				position: relative;
+				top: 6rpx;
+				margin-left: 20rpx;
+			}
 		}
 
 		.exam-list {

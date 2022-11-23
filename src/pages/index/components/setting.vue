@@ -52,72 +52,6 @@
 					url
 				})
 			},
-			// 清除阅读习惯
-			clearReadHabit() {
-				uni.clearStorageSync("readHabit")
-				this.$refs.uToast.show({
-					message: '清除成功',
-					type: 'success',
-					duration: 1500,
-				})
-			},
-
-			// 上传图片
-			modBackground() {
-				uni.chooseImage({
-					sizeType: ["compressed"],
-					count: 1,
-					success: (res) => {
-						console.log(res);
-						if (res.tempFiles[0].size > 1048576) {
-							uni.showToast({
-								title: "暂不支持上传大于1M的图片",
-								icon: "none"
-							})
-							return
-						}
-						let filePath = res.tempFilePaths[0]
-						let fileName = filePath.substring(filePath.lastIndexOf('/'), filePath.length)
-						uniCloud.uploadFile({
-							cloudPath: fileName,
-							filePath,
-						}).then(res => {
-							this.$http.request('edit/updateBackground', {
-								background: res.fileID
-							}).then(() => {
-								this.$refs.uToast.show({
-									message: '更换成功',
-									type: 'success',
-									duration: 1500,
-								})
-								uni.$emit("refreshUserInfo")
-							})
-						})
-					}
-				})
-			},
-			deleteBack() {
-				let that = this
-				uni.showModal({
-					title: "提示",
-					content: "是否要删除当前背景图?",
-					success(res) {
-						if (res.confirm) {
-							this.$http.request('edit/updateBackground', {
-								background: ''
-							}).then(res => {
-								that.$refs.uToast.show({
-									message: '移除成功',
-									type: 'success',
-									duration: 1500,
-								})
-								uni.$emit("refreshUserInfo")
-							})
-
-						}
-					}
-				})
-			},
 		}
 	}
 </script>
@@ -157,28 +91,5 @@
 			box-sizing: border-box;
 		}
 
-		.desc-text {
-			position: absolute;
-			bottom: 40rpx;
-			left: 0;
-			right: 0;
-			margin: 0 auto;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			image {
-				width: 60rpx;
-				height: 60rpx;
-				border-radius: 50%;
-			}
-
-			text {
-				margin-left: 30rpx;
-				font-size: 28rpx;
-				color: #333;
-				font-weight: bold;
-			}
-		}
 	}
 </style>

@@ -174,7 +174,7 @@ export default class {
 						resolve(data);
 						break;
 					case 300:
-						_this._showError(data.message, () => {});
+						_this._showError(data.msg, () => {});
 						reject(data);
 						break;
 						// 无效 token
@@ -186,9 +186,14 @@ export default class {
 						reject(data.code);
 						break;
 					case 500:
-						_this._showError(data.message, () => {});
+						_this._showError(data.msg, () => {});
 						reject(data.code);
 						break;
+					default:
+						_this._showError(data.msg, () => {});
+						reject(data.code);
+						break;
+
 				}
 
 			}).catch(res => {
@@ -216,9 +221,9 @@ export default class {
 			title: message,
 			icon: 'none',
 			duration: duration,
-			success() {
-				callback();
-			}
+			// success() {
+			// 	callback();
+			// }
 		});
 	}
 }

@@ -63,12 +63,6 @@ async function answerResult(event) {
 	if (userInfo.code) return userInfo
 	const collection = db.collection('answerHistory')
 	delete event.token
-	let answerer = {
-		avatarUrl: userInfo.avatarUrl,
-		nickName: userInfo.nickName,
-		id: userInfo.id
-	}
-	event.answerer = answerer
 	event.answererId = userInfo._id
 	event.createTime = createTime
 	let res = await collection.add(event)
@@ -90,12 +84,12 @@ async function createSubject(event) {
 	// 验证参数
 	if (topic.length <= 0) {
 		return {
-			code: 400,
+			code: 300,
 			msg: "请选择相应的题目",
 		}
 	} else if (!title) {
 		return {
-			code: 400,
+			code: 300,
 			msg: "请输入试卷标题"
 		}
 	}
@@ -105,12 +99,10 @@ async function createSubject(event) {
 	let res = await collection.add({
 		title,
 		topic,
-		token,
 		number,
 		limitTime,
 		endTime,
 		createTime,
-		creator: userInfo,
 		creatorId: userInfo._id,
 		qrcode: '',
 	})
@@ -153,7 +145,7 @@ async function addLabel(event) {
 	})
 	return {
 		code: 200,
-		message: '新增成功!',
+		msg: '新增成功!',
 	}
 }
 
@@ -171,7 +163,7 @@ async function addVersion(event) {
 	})
 	return {
 		code: 200,
-		message: '新增成功!',
+		msg: '新增成功!',
 	}
 }
 
@@ -198,7 +190,7 @@ async function addTopic(event) {
 	})
 	return {
 		code: 200,
-		message: '新增成功!',
+		msg: '新增成功!',
 	}
 }
 
@@ -225,6 +217,6 @@ async function addBookInfo(event) {
 	console.log(JSON.stringify(res))
 	return {
 		code: 200,
-		message: '新增成功!',
+		msg: '新增成功!',
 	}
 }

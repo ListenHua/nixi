@@ -9,7 +9,7 @@
 			</view>
 		</view>
 		<view class="interview-list">
-			<view class="interview-list__block" v-for="(item,index) in interviewList" :key="index">
+			<view class="interview-list__block" :class="item.className" v-for="(item,index) in interviewList" :key="index">
 				<topic-item :item='item' :index="index" @show="showAnswer" @select="selectAnswer"></topic-item>
 			</view>
 		</view>
@@ -184,7 +184,8 @@
 				}
 				this.$http.request('get/getTopicList', params).then(res => {
 					let list = res.data
-					list.forEach(item => {
+					list.forEach((item, index) => {
+						item.className = 'animation' + (index + 1)
 						item.show = false
 						item.wrong = false
 						item.answered = false
@@ -211,13 +212,15 @@
 
 <style scoped lang="scss">
 	@import url('main.css');
-	.add-btn{
+
+	.add-btn {
 		width: 60rpx;
 		height: 60rpx;
 		position: fixed;
 		right: 20rpx;
 		bottom: 30rpx;
 	}
+
 	.filter-pop {
 		position: relative;
 		display: flex;
@@ -269,12 +272,17 @@
 		padding: 20rpx 60rpx;
 	}
 
+	@for $i from 1 to 16 {
+		.animation#{$i} {
+			animation: fade-in-bottom .8s forwards $i*0.2s;
+		}
+	}
+
 	.interview-list {
 		padding: 0 40rpx;
 
 		&__block {
 			opacity: 0;
-			animation: fade-in-bottom .8s forwards 0.3s;
 		}
 	}
 

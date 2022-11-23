@@ -2,19 +2,10 @@
 	<view style="padding-bottom: 50rpx;">
 		<view class="paper">
 			<view class="paper-block" :class="item.className" v-for="(item,index) in list" :key="item._id"
-				@click="navigateTo(`/pages/topic/exam?id=${item._id}&type=answered`)">
-				<view class="one"></view>
-				<view class="paper-block__info">
-					<image :src="item.answerer.avatarUrl" mode="aspectFill"></image>
-					<text>{{item.answerer.nickName}}</text>
-				</view>
-				<view class="paper-block__title">{{item.info.title}}</view>
-				<view class="paper-block__content">
-					<view class="text" v-for="num in item.topic">
-						<view class="line" v-for="line in 3"></view>
-					</view>
-				</view>
-				<view class="paper-block__date">{{item.answerTime}}</view>
+				@click="navigateTo(`/pages/topic/exam?id=${item._id}&type=view`)">
+				<view class="paper-block__title">{{item.title}}</view>
+				<image class="paper-block__qrcode" :src="item.qrcode" mode="widthFix"></image>
+				<view class="paper-block__date">{{item.createDate}}</view>
 			</view>
 		</view>
 		<view style="padding: 0 50rpx;">
@@ -25,72 +16,66 @@
 			<text class="text">暂无答卷</text>
 		</view>
 	</view>
-
 </template>
 
 <script>
-	import http from '@/utils/network.js'
 	import dayjs from 'dayjs'
 	export default {
 		data() {
 			return {
-				list: [],
 				page: 1,
+				list: [],
 				nodata: false,
-				loading: false,
+				loading: false
 			}
 		},
+		onReachBottom() {
+			if (this.nodata || this.loading) return
+			this.getList()
+		},
 		onLoad() {
-			this.$nextTick(() => {
-				this.getReply()
-			})
-			uni.$off('examReply')
-			uni.$on('examReply', () => {
+			this.getList()
+			uni.$off('myExam')
+			uni.$on('myExam', () => {
 				this.list = []
 				this.page = 1
 				this.nodata = false
 				this.loading = false
-				this.getReply()
+				this.getList()
 			})
 		},
-		onReachBottom() {
-			if (this.nodata || this.loading) return
-			this.getReply()
-		},
 		methods: {
-			// 获取提交的考卷
-			getReply() {
+			getList() {
 				this.loading = true
 				uni.showLoading({
 					title: "数据加载中..."
 				})
 				let params = {
 					page: this.page,
-					limit: 15
+					limit: 15,
 				}
-				this.$http.request('get/getExamReply', params).then(res => {
-					this.loading = false
+				this.$http.request('get/myCreateExam', params).then(res => {
 					uni.hideLoading()
+					this.loading = false
 					let list = res.data
 					if (list.length == 0) {
 						this.nodata = true
 						return
 					}
 					list.map((item, index) => {
+						item.createDate = dayjs(item.createTime).format('YYYY-MM-DD HH:ss')
 						item.className = 'animation' + (index + 1)
-						item.answerTime = dayjs(item.createTime).format('YYYY-MM-DD HH:ss')
 						return item
 					})
 					this.page += 1
 					this.list = [...this.list, ...list]
 				})
 			},
-
 		}
 	}
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 	.nodata-block {
 		padding: 50rpx;
 		display: flex;
@@ -150,57 +135,18 @@
 				box-shadow: -8rpx 8rpx 12rpx -4rpx rgba(0, 0, 0, .2);
 			}
 
-			&__info {
-				display: flex;
-				align-items: center;
-
-				image {
-					width: 60rpx;
-					height: 60rpx;
-					border-radius: 50%;
-				}
-
-				text {
-					font-size: 24rpx;
-					color: #333;
-					margin-left: 10rpx;
-				}
-			}
 
 			&__title {
-				font-size: 28rpx;
-				margin-top: 20rpx;
+				font-size: 32rpx;
+				margin-bottom: 20rpx;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
 			}
 
-			&__content {
-				flex: 1;
-				overflow: scroll;
-				padding-top: 30rpx;
-
-				.text {
-					display: flex;
-					flex-direction: column;
-					position: relative;
-
-					&::after {
-						content: "";
-						position: absolute;
-						width: 10rpx;
-						height: 10rpx;
-						border-radius: 50%;
-						background-color: #333;
-						left: 0;
-						top: -4rpx;
-					}
-
-					.line {
-						width: 100%;
-						height: 6rpx;
-						margin-bottom: 24rpx;
-						background-color: #333;
-						margin-left: 30rpx;
-					}
-				}
+			&__qrcode {
+				width: 100%;
+				border-radius: 68rpx;
 			}
 
 			&__date {

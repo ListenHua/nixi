@@ -1,6 +1,9 @@
 <template>
 	<view>
 		<view class="start-page" :class="[pageLoad?'hide-start-page':'']">
+			<view class="loading-text" v-if="!startParams.cover">
+				<view v-for="item in loadingText">{{item}}</view>
+			</view>
 			<image :src="startParams.cover" mode="aspectFill" @click="startClick"></image>
 		</view>
 		<view class="page-content"
@@ -20,8 +23,6 @@
 			<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
 			<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
 			<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
-			<setting-view :menuShow="menuShow" :page="pageParams" @switch="switchPage">
-			</setting-view>
 			<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
 		</view>
 	</view>
@@ -29,7 +30,6 @@
 
 <script>
 	import DatabaseView from './components/database.vue'
-	import SettingView from './components/setting.vue'
 	import RecordView from './components/record.vue'
 	import InterviewView from './components/interview.vue'
 	import MainView from './components/main.vue'
@@ -40,7 +40,6 @@
 			RecordView,
 			InterviewView,
 			MainView,
-			SettingView,
 			TestView
 		},
 		data() {
@@ -49,7 +48,7 @@
 					main: '',
 					minor: ''
 				},
-				backgroundImg: '',
+				loadingText: '',
 				searchValue: '',
 				menuShow: false,
 				systemInfo: getApp().globalData.systemInfo,
@@ -69,10 +68,6 @@
 						title: "浏览记录",
 						value: "record"
 					},
-					{
-						title: "设置",
-						value: "setting"
-					},
 				],
 				testData: '',
 				startParams: '',
@@ -86,6 +81,9 @@
 			}
 		},
 		onLoad() {
+			let text = "Loading"
+			this.loadingText = text.split('')
+			console.log(this.loadingText);
 			this.getStartPage()
 			if (uni.getStorageSync('userInfo').role > 0) {
 				this.tabList.push({
@@ -153,12 +151,42 @@
 		animation: slide-out-bck-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 	}
 
+	@keyframes shrink {
+		50% {
+			transform: scale(0);
+		}
+	}
+
 	.start-page {
 		width: 100%;
 		height: 100vh;
 		position: fixed;
 		z-index: 9999;
 		background-color: #fff;
+
+		.loading-text {
+			position: absolute;
+			width: 100%;
+			top: 50%;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			view {
+				font-size: 80rpx;
+				letter-spacing: 20rpx;
+				font-family: emoji;
+				text-transform: uppercase;
+
+				@for $i from 1 to 8 {
+					&:nth-child(#{$i}) {
+						animation: shrink 3s infinite $i*0.2s;
+					}
+				}
+
+			}
+		}
 
 		image {
 			width: 100%;

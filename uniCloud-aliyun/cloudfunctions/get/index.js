@@ -41,9 +41,41 @@ exports.main = async (event, context) => {
 		case 'getReplyDetail': {
 			return getReplyDetail(event.params)
 		}
+		case 'myCreateExam': {
+			return myCreateExam(event.params)
+		}
 		default: {
 			return
 		}
+	}
+}
+
+// 获取我创建的考卷
+async function myCreateExam(event) {
+	let cmd = db.command
+	let limit = event.limit ? event.limit : 15
+	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
+	let start = page * limit
+	let userInfo = verifyInfo(event.token)
+	if (userInfo.code) return userInfo
+	const collection = db.collection('testPaper')
+	delete event.token
+	let key = {
+		creatorId: cmd.eq(userInfo._id)
+	}
+	let res = await collection.where(key).skip(start).limit(limit).orderBy('createTime', 'desc').get()
+	let total = await collection.where(key).count()
+	let result = res.data
+	for (let i in result) {
+		let user = await db.collection('userInfo').doc(result[i].creatorId).get()
+		result[i].creator = user.data[0]
+	}
+	console.log('userInfo----->', result)
+	return {
+		code: 200,
+		msg: "请求成功",
+		total: total.total,
+		data: result
 	}
 }
 
@@ -62,7 +94,7 @@ async function getReplyDetail(event) {
 		}
 	}
 	let result = res.data[0]
-	console.log('answerHistory',result);
+	console.log('answerHistory', result);
 	return {
 		code: 200,
 		msg: "请求成功",
@@ -80,7 +112,6 @@ async function getExamReply(event) {
 	if (userInfo.code) return userInfo
 	const collection = db.collection('answerHistory')
 	delete event.token
-	console.log(userInfo._id)
 	let key = {
 		info: {
 			creator: {
@@ -88,9 +119,13 @@ async function getExamReply(event) {
 			}
 		}
 	}
-	let res = await collection.where(key).skip(start).limit(limit).get()
+	let res = await collection.where(key).skip(start).limit(limit).orderBy('createTime', 'desc').get()
 	let total = await collection.where(key).count()
 	let result = res.data
+	for (let i in result) {
+		let user = await db.collection('userInfo').doc(result[i].answererId).get()
+		result[i].answerer = user.data[0]
+	}
 	return {
 		code: 200,
 		msg: "请求成功",

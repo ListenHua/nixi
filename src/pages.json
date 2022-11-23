@@ -81,7 +81,7 @@
             "path" : "pages/mine/exam-reply",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "考卷",
+                "navigationBarTitleText": "我收到的答卷",
                 "enablePullDownRefresh": false
             }
             
@@ -90,7 +90,7 @@
             "path" : "pages/mine/user-center",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "用户中心",
                 "enablePullDownRefresh": false
             }
             
@@ -99,7 +99,16 @@
             "path" : "pages/mine/edit-info",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "",
+                "navigationBarTitleText": "个人信息",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/mine/my-create-exam",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我创建的试卷",
                 "enablePullDownRefresh": false
             }
             

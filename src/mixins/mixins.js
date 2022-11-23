@@ -19,8 +19,7 @@ const systemInfo = {
 	onShow() {
 		this.userInfo = uni.getStorageSync('userInfo')
 	},
-	onLoad() {
-	},
+	onLoad() {},
 	onShareTimeline() {
 		let params = uni.getStorageSync('shareParams')
 		if (params) {
@@ -72,6 +71,11 @@ const systemInfo = {
 		navigateTo(url) {
 			uni.navigateTo({
 				url
+			})
+		},
+		navigaBack(delta) {
+			uni.navigateBack({
+				delta,
 			})
 		},
 	}

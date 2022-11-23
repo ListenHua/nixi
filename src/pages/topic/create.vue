@@ -339,12 +339,6 @@
 						id,
 					}
 					this.initQRcode(shareImg)
-				}).catch(res => {
-					uni.hideLoading()
-					uni.showToast({
-						title: res.msg,
-						icon: "none"
-					})
 				})
 			},
 			// 选择时间
