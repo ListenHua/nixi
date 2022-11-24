@@ -11,10 +11,12 @@
 		<view style="padding: 0 50rpx;">
 			<u-divider v-if="nodata&&page!=1" text="这是一条底线"></u-divider>
 		</view>
-		<view v-if="list.length==0&&page!=1" class="nodata-block">
-			<image class="icon" src="/static/images/nodata.svg"></image>
-			<text class="text">暂无答卷</text>
-		</view>
+		<n-empty v-if="list.length==0&&page==1&&nodata">
+			<view slot="text" class="empty-text">
+				<text>暂无创建的试卷，</text>
+				<text class="link" @click="navigateTo('/pages/topic/create')">点击去创建</text>
+			</view>
+		</n-empty>
 	</view>
 </template>
 
@@ -76,23 +78,19 @@
 </script>
 
 <style lang="scss" scoped>
-	.nodata-block {
-		padding: 50rpx;
+	.empty-text {
+		margin-top: 30rpx;
 		display: flex;
-		justify-content: center;
-		flex-direction: column;
 		align-items: center;
 
-		.icon {
-			width: 100rpx;
-			height: 100rpx;
-		}
-
-		.text {
+		text {
 			font-size: 28rpx;
 			color: $text-color-gray;
 			white-space: nowrap;
-			margin-top: 30rpx;
+		}
+
+		.link {
+			color: $color-main;
 		}
 	}
 

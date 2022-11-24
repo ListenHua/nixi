@@ -2,10 +2,7 @@
 	<scroll-view scroll-y :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
-		<view v-if="recordList.length==0" class="placeholder-block">
-			<image class="icon" src="/static/images/nodata.svg"></image>
-			<text class="text">暂无浏览记录</text>
-		</view>
+		<n-empty v-if="recordList.length==0" text="暂无浏览记录"></n-empty>
 		<view class="block" v-for="(item,index) in recordList" @click="viewRecord(item.id)">
 			<!-- <view class="icon-box">
 				<image class="icon" src="/static/images/book-icon.svg"></image>
@@ -163,6 +160,7 @@
 		}
 
 		.text {
+			margin-top: 30rpx;
 			font-size: 28rpx;
 			color: $text-color-gray;
 			white-space: nowrap;

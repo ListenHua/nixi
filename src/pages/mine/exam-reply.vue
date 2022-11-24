@@ -20,10 +20,7 @@
 		<view style="padding: 0 50rpx;">
 			<u-divider v-if="nodata&&page!=1" text="这是一条底线"></u-divider>
 		</view>
-		<view v-if="list.length==0&&page!=1" class="nodata-block">
-			<image class="icon" src="/static/images/nodata.svg"></image>
-			<text class="text">暂无答卷</text>
-		</view>
+		<n-empty v-if="list.length==0&&page==1&&nodata" text="暂无答卷"></n-empty>
 	</view>
 
 </template>
@@ -99,8 +96,8 @@
 		align-items: center;
 
 		.icon {
-			width: 100rpx;
-			height: 100rpx;
+			width: 200rpx;
+			height: 200rpx;
 		}
 
 		.text {

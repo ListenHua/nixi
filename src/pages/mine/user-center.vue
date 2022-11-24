@@ -1,11 +1,13 @@
 <template>
 	<view class="page-content">
 		<view class="user-info" v-if="userInfo">
-			<image class="head" :src="userInfo.avatarUrl" mode="aspectFill"></image>
+			<view class="head">
+				<image class="head-avatar" :src="userInfo.avatarUrl" mode="aspectFill"></image>
+				<view class="head-level">{{userInfo.level}}</view>
+			</view>
 			<view class="info">
 				<view class="name">{{userInfo.nickName}}</view>
-				<view class="level">等级：{{userInfo.level}}级</view>
-				<view class="auth">身份：{{roleName(userInfo.role)}}</view>
+				<view class="id">ID：{{userInfo.id}}</view>
 			</view>
 		</view>
 		<view class="cell-group">
@@ -48,25 +50,6 @@
 			this.userInfo = uni.getStorageSync('userInfo')
 		},
 		methods: {
-			roleName(role) {
-				switch (role) {
-					case 0:
-						return '普通用户'
-						break;
-					case 1:
-						return '优先体验者'
-						break;
-					case 2:
-						return '股东'
-						break;
-					case 9:
-						return '管理员'
-						break;
-					default:
-						return 'VIP'
-						break;
-				}
-			},
 			// 清除阅读习惯
 			clearReadHabit() {
 				uni.clearStorageSync("readHabit")
@@ -100,24 +83,45 @@
 			.head {
 				width: 160rpx;
 				height: 160rpx;
-				border-radius: 50%;
 				margin-right: 30rpx;
+				position: relative;
+
+				&-avatar {
+					width: 160rpx;
+					height: 160rpx;
+					border-radius: 50%;
+				}
+
+				&-level {
+					width: 48rpx;
+					height: 48rpx;
+					background-color: $color-main;
+					color: #fff;
+					line-height: 48rpx;
+					font-weight: bold;
+					font-size: 24rpx;
+					position: absolute;
+					border-radius: 50%;
+					text-align: center;
+					right: 0;
+					bottom: 0;
+				}
 			}
 
 			.info {
 				display: flex;
-				justify-content: space-between;
 				flex-direction: column;
+				justify-content: center;
 				height: 140rpx;
 
 				.name {
-					font-size: 40rpx;
+					font-size: 48rpx;
 					font-weight: bold;
 					color: #333;
 				}
 
-				.level {
-					font-size: 28rpx;
+				.id {
+					font-size: 32rpx;
 				}
 
 				.auth {

@@ -80,6 +80,32 @@
 				minor: ''
 			}
 		},
+		onShow() {
+			const updateManager = uni.getUpdateManager()
+			// 请求完新版本信息的回调
+			updateManager.onCheckForUpdate(res => {
+				console.log('更新信息', res);
+				if (res.hasUpdate) {
+					// 新版本下载成功
+					updateManager.onUpdateReady(() => {
+						uni.showModal({
+							title: '小程序已更新',
+							content: '点击确定重启小程序',
+							success(res) {
+								if (res.confirm) {
+									// 新的版本已经下载好，强制更新
+									updateManager.applyUpdate()
+								}
+							}
+						})
+					})
+				}
+			})
+			// 新版本下载失败
+			updateManager.onUpdateFailed(res => {
+				console.error(res)
+			})
+		},
 		onLoad() {
 			let text = "Loading"
 			this.loadingText = text.split('')

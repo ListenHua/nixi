@@ -9,6 +9,7 @@
 
 <script>
 	export default {
+		name: "n-bottom",
 		props: {
 			bgColor: {
 				type: String,
@@ -19,7 +20,6 @@
 				default: "128rpx"
 			}
 		},
-		name: "n-bottom",
 		data() {
 			return {
 

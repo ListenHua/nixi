@@ -33,6 +33,13 @@
 					</view>
 				</view>
 			</u-cell>
+
+
+			<u-cell :border='false' :customStyle="titleStyle" :value="roleName(userInfo.role)">
+				<view slot="title">
+					<text class="u-cell-text">身份</text>
+				</view>
+			</u-cell>
 		</view>
 		<u-popup :show="modNamePop" mode="center" round="20" @close="modNamePop=false">
 			<view class="modify-pop">
@@ -54,7 +61,7 @@
 			return {
 				userInfo: '',
 				titleStyle: {
-					fontSize: '30rpx',
+					fontSize: '28rpx',
 					color: "#000",
 					padding: "20rpx 0",
 					borderBottom: "2rpx solid #eee"
@@ -67,6 +74,25 @@
 			this.userInfo = uni.getStorageSync('userInfo')
 		},
 		methods: {
+			roleName(role) {
+				switch (role) {
+					case 0:
+						return '普通用户'
+						break;
+					case 1:
+						return '优先体验者'
+						break;
+					case 2:
+						return '股东'
+						break;
+					case 9:
+						return '管理员'
+						break;
+					default:
+						return 'VIP'
+						break;
+				}
+			},
 			choseHead() {
 				uni.chooseImage({
 					sizeType: ["compressed"],
@@ -264,7 +290,8 @@
 	}
 
 	.u-cell-text {
-		font-size: 30rpx;
+		font-size: 36rpx;
 		position: relative;
+		font-weight: bold;
 	}
 </style>
