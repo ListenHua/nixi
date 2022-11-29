@@ -1,11 +1,11 @@
 <template>
 	<view>
-		<!-- <view class="start-page" :class="[pageLoad?'hide-start-page':'']">
+		<view class="start-page" :class="[pageLoad?'hide-start-page':'']">
 			<view class="loading-text" v-if="!startParams.cover">
-				<view v-for="item in loadingText">{{item}}</view>
+				<view v-for="item in 6"></view>
 			</view>
 			<image :src="startParams.cover" mode="aspectFill" @click="startClick"></image>
-		</view> -->
+		</view>
 		<view class="page-content"
 			:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
 			<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
@@ -45,7 +45,6 @@
 					main: '',
 					minor: ''
 				},
-				loadingText: '',
 				searchValue: '',
 				menuShow: false,
 				systemInfo: getApp().globalData.systemInfo,
@@ -104,9 +103,6 @@
 			})
 		},
 		onLoad() {
-			let text = "Loading"
-			this.loadingText = text.split('')
-			console.log(this.loadingText);
 			this.getStartPage()
 		},
 		methods: {
@@ -161,7 +157,7 @@
 
 	@keyframes shrink {
 		50% {
-			transform: scale(0);
+			height: 50rpx
 		}
 	}
 
@@ -175,6 +171,7 @@
 		.loading-text {
 			position: absolute;
 			width: 100%;
+			height: 120rpx;
 			top: 50%;
 			text-align: center;
 			display: flex;
@@ -182,14 +179,15 @@
 			justify-content: center;
 
 			view {
-				font-size: 80rpx;
-				letter-spacing: 20rpx;
-				font-family: emoji;
-				text-transform: uppercase;
+				width: 20rpx;
+				height: 120rpx;
+				background-image: linear-gradient(to bottom, $color-main, $color-second);
+				border-radius: 8rpx;
+				margin: 0 10rpx;
 
-				@for $i from 1 to 8 {
+				@for $i from 1 to 7 {
 					&:nth-child(#{$i}) {
-						animation: shrink 3s infinite $i*0.2s;
+						animation: shrink 2s infinite $i*0.2s;
 					}
 				}
 
