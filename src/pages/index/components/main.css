@@ -5,8 +5,10 @@
 		left: 0;
 		top: 0;
 		background-color: #fff;
-		transition: all .5s;
+		transition: transform .5s;
 		box-sizing: border-box;
+		overflow: hidden;
+		transform: scale(1) translate(0);
 	}
 	.page-content{
 		padding-bottom: 50rpx;
@@ -23,8 +25,7 @@
 	}
 
 	.hide-page {
-		transform: scale(.6) translate(300rpx);
+		transform: scale(.75) translate(400rpx);
 		border-radius: 32rpx;
-		opacity: 0;
 		z-index: 30;
 	}

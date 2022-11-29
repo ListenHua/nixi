@@ -164,7 +164,11 @@ async function topicAnalysis(event) {
 	let total = await collection.where(key).count()
 	res = await collection.where(key).skip(start).limit(limit).get()
 	let result = res.data
-
+	for (let i in result) {
+		let user = await db.collection('userInfo').doc(result[i].createId).get()
+		console.log("用户信息————>",user)
+		result[i].author = user.data[0]
+	}
 	return {
 		code: 200,
 		msg: "请求成功",

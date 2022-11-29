@@ -53,6 +53,7 @@
 		onReachBottom() {
 			if (this.nodata || this.loading) return
 			this.getReply()
+			uni.vibrateShort()
 		},
 		methods: {
 			// 获取提交的考卷

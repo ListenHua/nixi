@@ -43,14 +43,14 @@ async function topicAnalysis(event) {
 	 * 帖子状态
 	 * 0 未审核 1 正常显示 2 异常
 	 */
-	console.log(userInfo)
-	event.status = userInfo.role > 0 ? 1 : 0
-	event.author = {
-		avatar: userInfo.avatarUrl,
-		name: userInfo.nickName,
-		id: userInfo._id
+	let params = {
+		topicId: event.id,
+		content: event.content,
+		createTime: event.createTime,
+		status: 0,
+		createId: userInfo._id,
 	}
-	let res = await collection.add(event)
+	let res = await collection.add(params)
 	return {
 		code: 200,
 		msg: "提交审核成功!",

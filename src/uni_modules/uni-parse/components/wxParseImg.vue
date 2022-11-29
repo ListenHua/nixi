@@ -21,7 +21,9 @@ export default {
 		};
 	},
 	inject: ['parseWidth'],
-	mounted() {},
+	mounted() {
+		console.log(this.node);
+	},
 	props: {
 		node: {
 			type: Object,
@@ -47,9 +49,10 @@ export default {
 		wxParseImgLoad(e) {
 			const { src } = e.currentTarget.dataset;
 			if (!src) return;
-			let { width, height } = e.mp.detail;
+			let { width, height } = this.node.attr;
 
 			const recal = this.wxAutoImageCal(width, height);
+			console.log('info---->',width,height,recal);
 
 			const { imageheight, imageWidth } = recal;
 			const { padding, mode } = this.node.attr;//删除padding
@@ -59,7 +62,7 @@ export default {
 			const imageHeightStyle = mode === 'widthFix' ? '' : `height: ${imageheight}px;`;
 
 			if(!styleStr) this.newStyleStr = `${styleStr}; ${imageHeightStyle}; width: ${imageWidth}px; padding: 0 ${+padding}px;`;//删除padding
-			// this.newStyleStr = `${styleStr}; ${imageHeightStyle}; width: ${imageWidth}px;`;
+			this.newStyleStr = `${styleStr}; ${imageHeightStyle}; width: ${imageWidth}px;`;
 		},
 		// 计算视觉优先的图片宽高
 		wxAutoImageCal(originalWidth, originalHeight) {

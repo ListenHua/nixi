@@ -1,11 +1,11 @@
 <template>
 	<view>
-		<view class="start-page" :class="[pageLoad?'hide-start-page':'']">
+		<!-- <view class="start-page" :class="[pageLoad?'hide-start-page':'']">
 			<view class="loading-text" v-if="!startParams.cover">
 				<view v-for="item in loadingText">{{item}}</view>
 			</view>
 			<image :src="startParams.cover" mode="aspectFill" @click="startClick"></image>
-		</view>
+		</view> -->
 		<view class="page-content"
 			:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
 			<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
@@ -19,7 +19,6 @@
 					@click="switchFuc(item.value)">{{item.title}}
 				</view>
 			</view>
-			<test-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></test-view>
 			<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
 			<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
 			<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
@@ -33,14 +32,12 @@
 	import RecordView from './components/record.vue'
 	import InterviewView from './components/interview.vue'
 	import MainView from './components/main.vue'
-	import TestView from './components/test.vue'
 	export default {
 		components: {
 			DatabaseView,
 			RecordView,
 			InterviewView,
-			MainView,
-			TestView
+			MainView
 		},
 		data() {
 			return {
@@ -111,21 +108,6 @@
 			this.loadingText = text.split('')
 			console.log(this.loadingText);
 			this.getStartPage()
-			if (uni.getStorageSync('userInfo').role > 0) {
-				this.tabList.push({
-					title: "实验室",
-					value: "test"
-				})
-			} else {
-				uni.$once("userLogin", () => {
-					if (uni.getStorageSync('userInfo').role > 0) {
-						this.tabList.push({
-							title: "实验室",
-							value: "test"
-						})
-					}
-				})
-			}
 		},
 		methods: {
 			// 点击启动页

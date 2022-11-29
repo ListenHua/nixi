@@ -34,6 +34,7 @@
 		onReachBottom() {
 			if (this.nodata || this.loading) return
 			this.getList()
+			uni.vibrateShort()
 		},
 		onLoad() {
 			this.getList()

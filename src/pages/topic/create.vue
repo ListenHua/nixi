@@ -148,6 +148,7 @@
 			if (this.nodata) return
 			this.pages += 1
 			this.getData()
+			uni.vibrateShort()
 		},
 		onLoad() {
 			this.getLabel()

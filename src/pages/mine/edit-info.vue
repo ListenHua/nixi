@@ -290,7 +290,7 @@
 	}
 
 	.u-cell-text {
-		font-size: 36rpx;
+		font-size: 32rpx;
 		position: relative;
 		font-weight: bold;
 	}

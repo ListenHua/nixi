@@ -6,17 +6,17 @@
 		<view class="analysis-box">
 			<view class="analysis-title">题目解析</view>
 			<view class="analysis-list">
-				<view class="analysis-block" v-for="item in analysisList">
+				<view class="analysis-block" :class="[item.className]" v-for="item in analysisList">
 					<view class="user-info" v-if="item.author">
-						<image class="head" :src="item.author.avatar" mode="aspectFill"></image>
+						<image class="head" :src="item.author.avatarUrl" mode="aspectFill"></image>
 						<view class="info-box">
-							<text class="name">{{item.author.name}}</text>
+							<text class="name">{{item.author.nickName}}</text>
 							<text class="time">{{item.createTime}}</text>
 						</view>
 					</view>
 					<view class="analysis-block__content">{{item.content}}</view>
 				</view>
-				<u-empty v-if="analysisList.length==0" text="该题暂无解析" mode="data"
+				<u-empty v-if="analysisList.length==0&&nodata" text="该题暂无解析" mode="data"
 					icon="http://cdn.uviewui.com/uview/empty/data.png">
 				</u-empty>
 			</view>
@@ -64,6 +64,7 @@
 			if (this.nodata) return
 			this.pages += 1
 			this.getAnalysisList()
+			uni.vibrateShort()
 		},
 		methods: {
 			// 初始化数据
@@ -77,14 +78,16 @@
 			getAnalysisList() {
 				this.$http.request('get/topicAnalysis', {
 					page: this.pages,
+					limit: 10,
 					id: this.id
 				}).then(res => {
 					let list = res.data
 					if (list.length == 0) {
 						this.nodata = true
 					}
-					list.forEach(item => {
+					list.forEach((item, index) => {
 						item.createTime = dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')
+						item.className = 'animation' + (index + 1)
 						this.analysisList.push(item)
 					})
 				})
@@ -142,6 +145,12 @@
 </script>
 
 <style scoped lang="scss">
+	@for $i from 1 to 16 {
+		.animation#{$i} {
+			animation: fade-in-right .8s forwards $i*0.2s;
+		}
+	}
+
 	.textarea-box {
 		background-color: #f8f8f8;
 		padding: 80rpx;
@@ -197,6 +206,13 @@
 		.analysis-list {
 			.analysis-block {
 				margin: 30rpx 0;
+				padding-bottom: 30rpx;
+				border-bottom: 2rpx solid #ddd;
+				opacity: 0;
+
+				&:last-child {
+					border: none;
+				}
 
 				.user-info {
 					display: flex;
