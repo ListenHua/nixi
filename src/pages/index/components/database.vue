@@ -75,7 +75,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import url('main.css');
+	@import url('../css/main.css');
 
 	.view-content {
 

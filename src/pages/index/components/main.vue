@@ -184,7 +184,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import url('main.css');
+	@import url('../css/main.css');
 	@import url('@/static/scss/animate.scss');
 
 	.page-content {

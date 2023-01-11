@@ -112,8 +112,6 @@ str = str.replace(/&acute;|&#180;|&#xB4;/g, "´");
 str = str.replace(/&times;|&#215;|&#xD7;/g, "×");
 str = str.replace(/&divide;|&#247;|&#xF7;/g, "÷");
 str = str.replace(/&amp;|&#38;|&#x26;/g, '&amp;');
-str = str.replace(/&lt;|&#60;|&#x3c;/g, '&lt;');
-str = str.replace(/&gt;|&#62;|&#x3e;/g, '&gt;');
 
 
 
@@ -128,8 +126,6 @@ str = str.replace(/&acute;|&#180;|&#xB4;/g, "´");
 str = str.replace(/&times;|&#215;|&#xD7;/g, "×");
 str = str.replace(/&divide;|&#247;|&#xF7;/g, "÷");
 str = str.replace(/&amp;|&#38;|&#x26;/g, '&');
-str = str.replace(/&lt;|&#60;|&#x3c;/g, '<');
-str = str.replace(/&gt;|&#62;|&#x3e;/g, '>');
 return str;
 }
 

@@ -46,7 +46,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import url('main.css');
+	@import url('../css/main.css');
 
 	.view-content {
 		background-color: #f8f8f8;

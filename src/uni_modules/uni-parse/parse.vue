@@ -9,7 +9,7 @@
  */-->
 
 <template>
-	
+
 	<!--基础元素-->
 	<view class="wxParse" :class="className" :style="'user-select:' + userSelect">
 		<block v-for="(node, index) of nodes" :key="index" v-if="!loading">
@@ -19,8 +19,8 @@
 </template>
 
 <script>
-import HtmlToJson from './libs/html2json';
-import wxParseTemplate from './components/wxParseTemplate0';
+	import HtmlToJson from './libs/html2json';
+	import wxParseTemplate from './components/wxParseTemplate0';
 
 	export default {
 		name: 'wxParse',
@@ -77,7 +77,7 @@ import wxParseTemplate from './components/wxParseTemplate0';
 			},
 			endHandler: {
 				type: Function,
-				default() {
+				default () {
 					return node => {
 						node = node
 					};
@@ -85,7 +85,7 @@ import wxParseTemplate from './components/wxParseTemplate0';
 			},
 			charsHandler: {
 				type: Function,
-				default() {
+				default () {
 					return node => {
 						node = node
 					};
@@ -139,19 +139,19 @@ import wxParseTemplate from './components/wxParseTemplate0';
 					chars: charsHandler
 				};
 				let results = HtmlToJson(parseData, customHandler, imageProp, this);
-
+				console.log('result---->', results);
 				this.imageUrls = results.imageUrls;
 				// this.nodes = results.nodes;
-				
+
 				this.nodes = [];
 				results.nodes.forEach((item) => {
 					setTimeout(() => {
-						if(item.node){
+						if (item.node) {
 							this.nodes.push(item)
 						}
 					}, 0);
 				})
-				
+
 			},
 			getWidth() {
 				return new Promise((res, rej) => {
@@ -221,7 +221,7 @@ import wxParseTemplate from './components/wxParseTemplate0';
 			};
 		},
 		watch: {
-			content(val){
+			content(val) {
 				this.setHtml()
 			}
 			// content: {

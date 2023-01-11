@@ -278,6 +278,11 @@ function html2json(html, customHandler, imageProp, host) {
 			}
 		},
 		chars(text) {
+			// 特殊处理（日后发现再继续补充）
+			text = text.replace(/&lt;|&#60;|&#x3c;/g, '&lt;');
+			text = text.replace(/&gt;|&#62;|&#x3e;/g, '&gt;');
+			text = text.replace(/&lt;|&#60;|&#x3c;/g, '<');
+			text = text.replace(/&gt;|&#62;|&#x3e;/g, '>');
 			if (!text.trim()) return;
 
 			const node = {

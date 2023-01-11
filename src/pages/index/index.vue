@@ -1,9 +1,7 @@
 <template>
 	<view>
 		<view class="start-page" :class="[pageLoad?'hide-start-page':'']">
-			<view class="loading-text" v-if="!startParams.cover">
-				<view v-for="item in 6"></view>
-			</view>
+			<n-loading-page v-if="!startParams.cover"></n-loading-page>
 			<image :src="startParams.cover" mode="aspectFill" @click="startClick"></image>
 		</view>
 		<view class="page-content"
@@ -59,6 +57,10 @@
 					{
 						title: "面试题",
 						value: "interview"
+					},
+					{
+						title: "模拟面试",
+						value: "simulation"
 					},
 					{
 						title: "浏览记录",
@@ -143,7 +145,13 @@
 			},
 			// 菜单栏操作
 			switchFuc(val) {
+				// 查看历史浏览刷新数据
 				if (val == 'record') this.$refs.record.refresh()
+				// 跳转去模拟面试
+				if (val == 'simulation') {
+					this.navigateTo('/pages/modules/simulation/index')
+					return
+				}
 				this.switchPage(val)
 			},
 		}
@@ -155,44 +163,12 @@
 		animation: slide-out-bck-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 	}
 
-	@keyframes shrink {
-		50% {
-			height: 50rpx
-		}
-	}
-
 	.start-page {
 		width: 100%;
 		height: 100vh;
 		position: fixed;
 		z-index: 9999;
 		background-color: #fff;
-
-		.loading-text {
-			position: absolute;
-			width: 100%;
-			height: 120rpx;
-			top: 50%;
-			text-align: center;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			view {
-				width: 20rpx;
-				height: 120rpx;
-				background-image: linear-gradient(to bottom, $color-main, $color-second);
-				border-radius: 8rpx;
-				margin: 0 10rpx;
-
-				@for $i from 1 to 7 {
-					&:nth-child(#{$i}) {
-						animation: shrink 2s infinite $i*0.2s;
-					}
-				}
-
-			}
-		}
 
 		image {
 			width: 100%;

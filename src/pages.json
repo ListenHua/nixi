@@ -113,6 +113,24 @@
             }
             
         }
+        ,{
+            "path" : "pages/modules/simulation/index",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "模拟面试",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/modules/simulation/scene",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"subPackages": [],
 	"globalStyle": {

@@ -9,11 +9,16 @@
 			</view>
 		</view>
 		<view class="interview-list">
-			<view class="interview-list__block" :class="item.className" v-for="(item,index) in interviewList" :key="index">
+			<view class="interview-list__block" :class="item.className" v-for="(item,index) in interviewList"
+				:key="index">
 				<topic-item :item='item' :index="index" @show="showAnswer" @select="selectAnswer"></topic-item>
 			</view>
 		</view>
+		<!-- 加载数据提示 -->
+		<n-loading-bottom v-if="!nodata" :show="loading"></n-loading-bottom>
+		<!-- 创建面试题按钮 -->
 		<image class="add-btn" src="/static/images/add-icon.svg" mode="aspectFill" @click="createTopic"></image>
+		<!-- 到底提示 -->
 		<u-divider v-if="nodata" text="已经到底了" :customStyle="{padding:'40rpx 60rpx'}"></u-divider>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
@@ -65,6 +70,7 @@
 				labelValue: [],
 				pages: 1,
 				nodata: false,
+				loading: false,
 				filterShow: false,
 			}
 		},
@@ -88,6 +94,7 @@
 			loadingData() {
 				if (this.nodata) return
 				this.pages += 1
+				this.loading = true
 				this.getData()
 			},
 			// 重置
@@ -183,6 +190,7 @@
 					label: this.labelValue
 				}
 				this.$http.request('get/getTopicList', params).then(res => {
+					this.loading = false
 					let list = res.data
 					list.forEach((item, index) => {
 						item.className = 'animation' + (index + 1)
@@ -204,6 +212,8 @@
 					if (list.length < 15) {
 						this.nodata = true
 					}
+				}).catch(res => {
+					this.loading = true
 				})
 			},
 		}
@@ -211,7 +221,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import url('main.css');
+	@import url('../css/main.css');
 
 	.add-btn {
 		width: 60rpx;
