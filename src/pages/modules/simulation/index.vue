@@ -2,7 +2,7 @@
 	<view>
 		<view class="special">
 			<view class="special-card" :class="[item.className]" v-for="(item,index) in specialList" :key="index"
-				@click="navigateTo('/pages/modules/simulation/scene')">
+				@click="navigateTo('/pages/modules/simulation/scene?id='+item.id)">
 				<image class="special-card__icon" :src="item.icon" mode="aspectFill"></image>
 				<view class="special-card__info">
 					<view class="special-card__info-title">{{item.title}}</view>
@@ -18,16 +18,18 @@
 		data() {
 			return {
 				specialList: [{
+					id: 1,
 					icon: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/7a48469a-6b12-4737-ae5b-fb9fa2a56a0d.gif',
 					logo: "",
 					title: "前端专题",
-					descript: "原型链，继承，作用域，闭包，变量提升，this的指向，立即执行函数等前端知识模拟面试"
+					descript: "原型链、继承、作用域、闭包、变量提升、this的指向、立即执行函数等前端知识模拟面试"
 
 				}, {
-					icon: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/bf2b15c4-d948-46e9-927c-f1addee255eb.gif',
+					id: 2,
+					icon: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/52d709e7-e773-423e-8526-e9ea03b1e683.gif',
 					logo: "",
-					title: "Java专题",
-					descript: "原型链，继承，作用域，闭包，变量提升，this的指向，立即执行函数等前端知识模拟面试"
+					title: "Go专题",
+					descript: "底层原理、切片、map、函数、结构体、接口、channel等Golang知识模拟面试"
 
 				}]
 			}
@@ -46,13 +48,13 @@
 <style lang="scss" scoped>
 	@for $i from 1 to 16 {
 		.animation#{$i} {
-			animation: fade-in-right 1s forwards $i*0.3s;
+			animation: fade-in-right .5s forwards $i*0.2s;
 		}
 	}
 
 	.special {
 		padding: 40rpx;
-		
+
 		&-card {
 			opacity: 0;
 			width: 100%;

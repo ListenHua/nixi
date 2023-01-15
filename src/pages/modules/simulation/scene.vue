@@ -36,42 +36,74 @@
 				interviewStep: 0, // 进行的步骤
 				// 谈话列表数据
 				interviewTalk: [{
-						text: "你好，欢迎来到模拟面试",
-						talker: "hr",
-						type: "talk",
-						button: "",
-						speed: 100,
-					}, {
-						text: "你好，面试官",
-						talker: "me",
-						type: "talk",
-						button: "",
-						speed: 100,
-					}, {
-						text: "模拟面试只有问答题，是否需要填写视自己情况而定，最终提交后可以在“我的-模拟历史”查看相应的模拟面试记录",
-						talker: "hr",
-						type: "talk",
-						button: "我知道了",
-						speed: 50,
-					},
-					{
-						text: "请你解释一下instanceof原理",
-						talker: "hr",
-						type: "ask",
-						button: "回答",
-						speed: 100,
-					},
-					{
-						text: "请你说一下apply和call的作用及区别",
-						talker: "hr",
-						type: "ask",
-						button: "回答",
-						speed: 100,
-					}
-				],
+					text: "你好，欢迎来到模拟面试",
+					talker: "hr",
+					type: "talk",
+					button: "",
+					speed: 100,
+				}, {
+					text: "你好，面试官",
+					talker: "me",
+					type: "talk",
+					button: "",
+					speed: 100,
+				}],
 			}
 		},
-		onLoad() {
+		onLoad(option) {
+			if (!uni.getStorageSync('viewSimulation')) {
+				this.interviewTalk.push({
+					text: "模拟面试只有问答题，是否需要填写视自己情况而定，最终提交后可以在“我的-模拟历史”查看相应的模拟面试记录",
+					talker: "hr",
+					type: "talk",
+					button: "我知道了",
+					speed: 50,
+				})
+			}
+			let ary;
+			if (option.id == 1) {
+				ary = [{
+					text: "请你简述一下v-model的原理",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+				}, {
+					text: "请你解释一下instanceof原理",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+				}, {
+					text: "请你说一下apply和call的作用及区别",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+				}]
+			} else {
+				ary = [{
+					text: "golang 中 make 和 new 的区别？",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+				}, {
+					text: "数组和切片的区别",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+				}, {
+					text: "for range 的时候它的地址会发生变化么？",
+					talker: "hr",
+					type: "ask",
+					button: "回答",
+					speed: 100,
+
+				}]
+			}
+			this.interviewTalk = this.interviewTalk.concat(ary)
 			setTimeout(() => {
 				this.talkTo()
 			}, 1000)
@@ -96,6 +128,7 @@
 				console.log(data[step]);
 				if (data[step].type == 'talk') {
 					this.interviewStep += 1
+					uni.setStorageSync('viewSimulation', true)
 					this.talkTo()
 				} else if (data[step].type == 'ask') {
 					this.talker = 'me'
@@ -117,7 +150,7 @@
 						button: "结束面试"
 					})
 				}
-				
+
 				// 判断是否不清楚
 				if (answer.length < 6) {
 					let know = true
