@@ -1,3 +1,6 @@
+import {
+	className
+} from '@/utils/index.js'
 const mixins = {
 	props: {
 		menuShow: {
@@ -25,7 +28,7 @@ const mixins = {
 	},
 	methods: {
 		checkPage() {
-			let params = this.$handle.className(this.menuShow, this.page, this.$options.name)
+			let params = className(this.menuShow, this.page, this.$options.name)
 			this.className = params.class
 			this.zIndex = params.zIndex
 		},

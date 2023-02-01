@@ -16,5 +16,7 @@ async function uploadImage(params) {
 		fileContent:params.file
 	}).then(res=>{
 		console.log("上传成功",res);
+	}).catch(res=>{
+		console.log("上传失败",res);
 	})
 }

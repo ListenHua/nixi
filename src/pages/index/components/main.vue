@@ -5,7 +5,7 @@
 		<view class="page-content">
 			<view class="user-info">
 				<view class="welcome-text">
-					<view class="text">Welcome,</view>
+					<view class="text">Welcome</view>
 					<view class="name text-focus-in" v-if="isLogin" @click="navigateTo('/pages/mine/user-center')">
 						{{userInfo.nickName}}
 					</view>

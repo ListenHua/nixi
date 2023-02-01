@@ -44,9 +44,56 @@ exports.main = async (event, context) => {
 		case 'myCreateExam': {
 			return myCreateExam(event.params)
 		}
+		case 'simulationList': {
+			return simulationList(event.params)
+		}
+		case 'simulationTopic': {
+			return simulationTopic(event.params)
+		}
 		default: {
 			return
 		}
+	}
+}
+
+// 获取模拟面试专题试题
+async function simulationTopic(event){
+	let cmd = db.command
+	let key = event.key
+	const collection = db.collection('simulation-topic')
+	// 初级题目
+	let primary = await collection.aggregate().match({key,level:1}).sample({size:5}).end()
+	primary = primary.data
+	// 中级题目
+	let middle_rank = await collection.aggregate().match({key,level:2}).sample({size:5}).end()
+	middle_rank = middle_rank.data
+	// 高级题目
+	let senior = await collection.aggregate().match({key,level:3}).sample({size:5}).end()
+	senior = senior.data
+	
+	let result = [...primary,...middle_rank,...senior]
+	
+	return {
+		code: 200,
+		msg: "请求成功",
+		data: result
+	}
+}
+// 获取模拟面试专题列表
+async function simulationList(event){
+	let cmd = db.command
+	let limit = event.limit ? event.limit : 15
+	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
+	let start = page * limit
+	const collection = db.collection('simulation-list')
+	let res = await collection.skip(start).limit(limit).get()
+	let total = await collection.count()
+	let result = res.data
+	return {
+		code: 200,
+		msg: "请求成功",
+		total: total.total,
+		data: result
 	}
 }
 

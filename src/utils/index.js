@@ -1,7 +1,7 @@
-function className(menu,page,name){
+function className(menu, page, name) {
 	let obj = {
-		class:"",
-		zIndex:30,
+		class: "",
+		zIndex: 30,
 	}
 	if (menu) {
 		if (page.main == name) {
@@ -27,6 +27,6 @@ function className(menu,page,name){
 	return obj
 }
 
-export default{
+export {
 	className
 }

@@ -6,6 +6,13 @@
 		onLaunch: function() {
 			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
 			this.$http.request('get/systemData', {
+				type: 'simulation'
+			}).then(res => {
+				let data = res.data
+				uni.setStorageSync('simulationConfig', data)
+			})
+
+			this.$http.request('get/systemData', {
 				type: 'share'
 			}).then(res => {
 				let data = res.data

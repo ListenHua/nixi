@@ -9,7 +9,7 @@ const systemInfo = {
 			share: {
 				title: '匿习',
 				path: 'pages/index/index',
-				imageUrl: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/71473287-ddb9-460e-961c-d9e6e8a574bc.png',
+				imageUrl: 'https://mp-54f1765b-5282-47cf-8405-d6f9ccf838c3.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/71473287-ddb9-460e-961c-d9e6e8a574bc.png',
 				desc: '学习工具',
 				content: '',
 			},
@@ -74,9 +74,16 @@ const systemInfo = {
 			})
 		},
 		navigaBack(delta) {
-			uni.navigateBack({
-				delta,
-			})
+			let routes = getCurrentPages()
+			if (routes.length <= 1) {
+				uni.reLaunch({
+					url:'/pages/index/index'
+				})
+			} else {
+				uni.navigateBack({
+					delta,
+				})
+			}
 		},
 	}
 }

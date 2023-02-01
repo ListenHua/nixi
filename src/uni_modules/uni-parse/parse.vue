@@ -139,7 +139,6 @@
 					chars: charsHandler
 				};
 				let results = HtmlToJson(parseData, customHandler, imageProp, this);
-				console.log('result---->', results);
 				this.imageUrls = results.imageUrls;
 				// this.nodes = results.nodes;
 
@@ -188,7 +187,6 @@
 				});
 			},
 			navigate(href, $event, attr) {
-				console.log(href, attr);
 				this.$emit('navigate', href, $event);
 			},
 			preview(src, $event) {

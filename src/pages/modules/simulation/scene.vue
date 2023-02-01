@@ -1,23 +1,27 @@
 <template>
 	<view>
 		<!-- 面试场景 -->
-		<image class="top-image" :src="topImage" mode="aspectFill" @click="skip"></image>
+		<image class="top-image" :src="simulationConfig.top_image" mode="aspectFill"></image>
 		<view class="question" v-if="talker=='hr'">
 			<text class="talk-text">{{talkText}}</text>
 			<view class="question__bottom" v-if="buttonText">
-				<n-button width="160rpx" height="68rpx" fontSize="24" @click="next"
+				<n-button width="160rpx" height="68rpx" fontSize="24" @click.stop="next"
 					:customStyle="{animation: 'fade-in 0.5s forwards'}">{{buttonText}}</n-button>
 			</view>
 		</view>
 		<view class="answer" v-if="talker=='me'">
 			<template v-if="startAnswer">
-				<textarea v-model="answerText" auto-focus auto-height></textarea>
+				<textarea v-model="answerText" auto-focus auto-height placeholder="如心有答案,可空白提交"></textarea>
 				<view class="question__bottom">
-					<n-button width="160rpx" height="68rpx" fontSize="24" @click="submit">提交</n-button>
+					<n-button width="160rpx" height="68rpx" fontSize="24" @click.stop="submit">提交</n-button>
 				</view>
 			</template>
 			<text class="talk-text" v-else>{{talkText}}</text>
 		</view>
+		<view class="none" v-if="talker=='none'">
+			<text class="talk-text">{{talkText}}</text>
+		</view>
+		<view class="skip-layer" @click="skipTalk"></view>
 	</view>
 </template>
 
@@ -25,7 +29,7 @@
 	export default {
 		data() {
 			return {
-				topImage: 'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-54f1765b-5282-47cf-8405-d6f9ccf838c3/fa3266c9-0499-407a-bb21-910d8354e4f4.gif',
+				simulationConfig: '',
 				talking: false, // 是否正在谈话
 				talker: '', // 正在说话的人物
 				talkText: '', // 说话的内容
@@ -48,68 +52,55 @@
 					button: "",
 					speed: 100,
 				}],
+				interviewLoading: true,
+				// 打字机定时器
+				typeingInterval: '',
+				typeingOverInterval: '',
+				dialogTimeout: '',
+				// 快速谈话
+				nextLoading: false,
+				skipTimeout: '',
 			}
 		},
 		onLoad(option) {
-			if (!uni.getStorageSync('viewSimulation')) {
-				this.interviewTalk.push({
-					text: "模拟面试只有问答题，是否需要填写视自己情况而定，最终提交后可以在“我的-模拟历史”查看相应的模拟面试记录",
-					talker: "hr",
-					type: "talk",
-					button: "我知道了",
-					speed: 50,
-				})
-			}
-			let ary;
-			if (option.id == 1) {
-				ary = [{
-					text: "请你简述一下v-model的原理",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-				}, {
-					text: "请你解释一下instanceof原理",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-				}, {
-					text: "请你说一下apply和call的作用及区别",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-				}]
-			} else {
-				ary = [{
-					text: "golang 中 make 和 new 的区别？",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-				}, {
-					text: "数组和切片的区别",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-				}, {
-					text: "for range 的时候它的地址会发生变化么？",
-					talker: "hr",
-					type: "ask",
-					button: "回答",
-					speed: 100,
-
-				}]
-			}
-			this.interviewTalk = this.interviewTalk.concat(ary)
+			this.simulationConfig = uni.getStorageSync('simulationConfig')
+			// if (!uni.getStorageSync('viewSimulation')) {
+			// 	this.interviewTalk.push({
+			// 		text: "模拟面试只有问答题，是否需要填写视自己情况而定，最终提交后可以在“我的-模拟历史”查看相应的模拟面试记录",
+			// 		talker: "hr",
+			// 		type: "talk",
+			// 		button: "我知道了",
+			// 		speed: 50,
+			// 	})
+			// }
+			this.talker = 'none'
+			this.talkText = this.simulationConfig.loading_text
 			setTimeout(() => {
-				this.talkTo()
-			}, 1000)
+				this.getTopic(option.key)
+			}, 500)
 		},
 		methods: {
-			// 模拟开场
+			// 获取模拟试题
+			getTopic(key) {
+				let params = {
+					key
+				}
+				this.$http.request('get/simulationTopic', params).then(res => {
+					let data = res.data
+					this.interviewLoading = false
+					if (data.length == 0) {
+						this.interviewTalk.push({
+							text: this.simulationConfig.over_text,
+							talker: "hr",
+							type: "over",
+							button: "结束面试"
+						})
+					}
+					this.interviewTalk = this.interviewTalk.concat(data)
+					this.talkTo()
+				})
+			},
+			// 谈话
 			talkTo() {
 				let data = this.interviewTalk
 				let step = this.interviewStep
@@ -125,7 +116,6 @@
 			next() {
 				let data = this.interviewTalk
 				let step = this.interviewStep
-				console.log(data[step]);
 				if (data[step].type == 'talk') {
 					this.interviewStep += 1
 					uni.setStorageSync('viewSimulation', true)
@@ -138,13 +128,13 @@
 				}
 			},
 			submit() {
-				let ary = ['不清楚', '不知道', '不懂']
+				let ary = this.simulationConfig.unknow_key_word
 				let answer = this.answerText
 
 				// 判断是否已结束
 				if (this.interviewStep == this.interviewTalk.length - 1) {
 					this.interviewTalk.push({
-						text: "感谢您本次的面试",
+						text: this.simulationConfig.over_text,
 						talker: "hr",
 						type: "over",
 						button: "结束面试"
@@ -162,7 +152,7 @@
 					if (!know) {
 						this.answerText = ''
 						this.typeingText({
-							text: "好的，没关系，后面可以了解一下",
+							text: this.simulationConfig.unknow_answer_text,
 							talker: "hr",
 							type: "talk",
 						})
@@ -170,8 +160,6 @@
 					}
 				}
 
-				console.log('step.length', this.interviewStep, this.interviewTalk.length);
-				console.log('boolean', this.interviewStep == this.interviewTalk.length - 1);
 				this.answerText = ''
 				this.interviewStep += 1
 				this.talkTo()
@@ -181,51 +169,82 @@
 				this.resetTalk()
 				this.talking = true
 				this.talker = data.talker
-				let text = data.text.split('')
+				let text = data.text
 				let speed = data.speed ? data.speed : 100
 				let delay = text.length > 20 ? 5000 : 1500
-				/* 测试时的速度 */
-				// let speed = 0
-				// let delay = 0
 				// 为了等待对话框动画加载
-				setTimeout(() => {
-					text.forEach((item, index) => {
-						// 一个个字符拼接，生成打字效果
-						setTimeout(() => {
-							this.talkText += item
-						}, speed * index)
-					})
+				this.dialogTimeout = setTimeout(() => {
+					let length = text.length
+					let position = 0
+					this.typeingInterval = setInterval(() => {
+						this.talkText = text.substring(0, position)
+						position += 1
+						if (position > length) {
+							clearInterval(this.typeingInterval)
+						}
+					}, speed)
 				}, 500)
 				// 如有按钮文本等待字体加载完后显示按钮
-				setTimeout(() => {
+				this.typeingOverInterval = setTimeout(() => {
 					this.talking = false
 					this.buttonText = data.button
+					// 谈话模式并且无按钮
+					if (data.type == 'talk' && !data.button) {
+						this.skipTimeout = setTimeout(() => {
+							this.interviewStep += 1
+							this.nextLoading = false
+							this.talkTo()
+						}, 3000)
+					}
 				}, speed * text.length + 600)
 
-				// 谈话模式并且无按钮
-				if (data.type == 'talk' && !data.button) {
-					setTimeout(() => {
-						this.interviewStep += 1
-						this.talkTo()
-					}, (speed * text.length) + 3000)
-				}
-				// 额外的对话
-				// if (data.type == 'extra') {
-				// 	setTimeout(() => {
-				// 		this.interviewStep += 1
-				// 		this.talkTo()
-				// 	}, (speed * text.length) + 3000)
-				// }
 			},
 			// 跳过前置对话
 			skipTalk() {
-
+				if (this.interviewLoading) return
+				let data = this.interviewTalk[this.interviewStep]
+				clearTimeout(this.dialogTimeout)
+				clearTimeout(this.skipTimeout)
+				clearInterval(this.typeingInterval)
+				clearTimeout(this.typeingOverInterval)
+				if (this.nextLoading) {
+					// 谈话模式并且无按钮
+					if (data.type == 'talk' && !data.button) {
+						this.nextLoading = false
+						this.interviewStep += 1
+						this.talkTo()
+					}
+					return
+				}
+				this.nextLoading = false
+				this.talkText = data.text
+				this.talking = false
+				this.buttonText = data.button
+				// 谈话模式并且无按钮
+				if (data.type == 'talk' && !data.button) {
+					this.nextLoading = true
+					this.skipTimeout = setTimeout(() => {
+						this.interviewStep += 1
+						this.nextLoading = false
+						this.talkTo()
+					}, 3000)
+				}
 			},
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.skip-layer {
+		position: fixed;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: auto;
+	}
+
 	.top-image {
 		width: 512rpx;
 		height: 324rpx;
@@ -271,8 +290,26 @@
 
 	}
 
+	.none {
+		background: $color-main;
+
+		.talk-text {
+			color: #fff;
+			animation: none !important;
+		}
+
+		&::before {
+			content: '';
+			position: absolute;
+			width: 0;
+			height: 0;
+			border: 24rpx solid transparent;
+		}
+	}
+
 	.question,
-	.answer {
+	.answer,
+	.none {
 		width: 80%;
 		font-size: 32rpx;
 		padding: 30rpx;
@@ -293,7 +330,7 @@
 		font-size: 28rpx;
 		font-weight: 500;
 		border-right: 2rpx solid transparent;
-		animation: caret .5s steps(1) infinite;
+		animation: caret 1s steps(1) infinite;
 	}
 
 	@keyframes caret {

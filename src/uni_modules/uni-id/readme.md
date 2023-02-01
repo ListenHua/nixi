@@ -14,7 +14,7 @@
 
 详细checkToken流程如下：
 
-![](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/ed45d350-5a4d-11eb-b997-9918a5dda011.jpg)
+![](https://mp-54f1765b-5282-47cf-8405-d6f9ccf838c3.cdn.bspapp.com/VKCEYUGU-dc-site/ed45d350-5a4d-11eb-b997-9918a5dda011.jpg)
 
 可以看出，旧版token（removePermissionAndRoleFromToken为true时生成的）在checkToken时如需返回权限需要进行两次数据库查询。新版token不需要查库即可返回权限信息。
 

@@ -1,11 +1,11 @@
 <template>
 	<view class="page-content">
 		<view class="user-info" v-if="userInfo">
-			<view class="head">
+			<view class="head" @click="navigateTo('/pages/mine/edit-info')">
 				<image class="head-avatar" :src="userInfo.avatarUrl" mode="aspectFill"></image>
 				<view class="head-level">{{userInfo.level}}</view>
 			</view>
-			<view class="info">
+			<view class="info" @click="navigateTo('/pages/mine/edit-info')">
 				<view class="name">{{userInfo.nickName}}</view>
 				<view class="id">ID：{{userInfo.id}}</view>
 			</view>
@@ -68,16 +68,15 @@
 	.page-content {
 		min-height: 100vh;
 		background-color: #f8f8f8;
-		padding: 30rpx;
 
 		.user-info {
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 			background-color: #fff;
 			padding: 30rpx;
 			box-sizing: border-box;
-			margin: 0 auto;
-			width: 90%;
+			width: 100%;
 			border-radius: 16rpx;
 
 			.head {
