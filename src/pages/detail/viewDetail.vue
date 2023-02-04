@@ -19,14 +19,14 @@
 			</view>
 		</view>
 		<view class="data-list" v-if="readHabit=='scroll'">
-			<view class="block line" v-for="(item,index) in info.list" :key="index">
+			<view class="block line" v-for="(item,index) in bookContent" :key="index">
 				<view class="title">{{item.title}}</view>
 				<uni-parse :content="item.content"></uni-parse>
 			</view>
 		</view>
 		<swiper v-if="readHabit=='swiper'" class="data-list" :current="contentIndex"
 			:style="{'height':screenHeight+'px'}" @change="swiperContent">
-			<swiper-item class="block" v-for="(item,index) in info.list" :key="index">
+			<swiper-item class="block" v-for="(item,index) in bookContent" :key="index">
 				<scroll-view scroll-y :style="{'height':screenHeight+'px'}">
 					<view class="title">{{item.title}}</view>
 					<uni-parse :content="item.content"></uni-parse>
@@ -46,19 +46,21 @@
 		},
 		data() {
 			return {
-				info: "",
+				bookInfo: "",
+				bookContent: [],
 				systemInfo: getApp().globalData.systemInfo,
 				scrollHeight: "",
 				screenHeight: "",
 				contentIndex: 0, // 滑动浏览下标
-				viewProgress: 0, // 滚动浏览滚动值
 				read_progress: 0,
 				habitPop: false,
 				readHabit: 'scroll',
+				pageScroll: 0,
 				autoSaveFunction: "",
 				bookId: '',
 				pageType: '',
 				historyValue: 0,
+				total: 0,
 			}
 		},
 		onPageScroll(e) {
@@ -66,7 +68,7 @@
 				let system = this.systemInfo
 				let scroll = e.scrollTop
 				let height = this.scrollHeight - system.screenHeight + system.statusBarHeight + 44
-				this.viewProgress = scroll
+				this.pageScroll = scroll
 				this.read_progress = scroll / height
 				clearTimeout(timer)
 
@@ -81,11 +83,11 @@
 			this.pageType = option.type
 			this.screenHeight = system.screenHeight - system.statusBarHeight - 44
 			if (option.type == 'history') {
-				this.getHistoryView(option.id)
+				this.getHistoryView()
 			} else if (option.type == 'share') {
 				this.readHabit = option.habit
 				this.historyValue = option.value
-				this.getData(option.id)
+				this.getData()
 			} else {
 				let readHabit = uni.getStorageSync('readHabit')
 				if (readHabit) {
@@ -93,17 +95,16 @@
 				} else {
 					this.habitPop = true
 				}
-				this.getData(option.id)
+				this.getData()
 			}
 		},
 		onUnload() {
 			clearInterval(this.autoSaveFunction)
 		},
 		onShareAppMessage() {
-			let info = this.info
+			let info = this.bookInfo
 			let habit = this.readHabit
-			console.log('value————————》', this.viewProgress, this.contentIndex);
-			let value = habit == 'scroll' ? this.viewProgress : this.contentIndex
+			let value = this.contentIndex
 			return {
 				title: info.title,
 				path: `pages/detail/viewDetail?id=${info._id}&type=share&habit=${habit}&value=${value}`,
@@ -113,49 +114,64 @@
 			}
 		},
 		methods: {
-			queryContentHeight() {
-				let that = this
+			getNodeHeight(id) {
+				return new Promise((resovle) => {
+					const query = uni.createSelectorQuery().in(this)
+					query.select(id).boundingClientRect((data) => {
+						resovle(data)
+					}).exec()
+				})
+			},
+			async queryContentHeight() {
+				let list = this.bookContent
 				if (this.readHabit == 'swiper') {
-					this.read_progress = (this.contentIndex + 1) / this.info.list.length
-					this.contentIndex = this.historyValue
+					this.read_progress = (this.contentIndex + 1) / this.total
 				} else {
-					let query = uni.createSelectorQuery()
-					query.select('.page-content').boundingClientRect().exec(function(res) {
-						that.scrollHeight = res[0].height
-					})
-					uni.pageScrollTo({
-						scrollTop: this.historyValue,
-					})
+					let scrollHeight = await this.getNodeHeight('.page-content')
+					this.scrollHeight = scrollHeight.height
+					const query = uni.createSelectorQuery().in(this)
+					query.selectAll('.block').boundingClientRect((data) => {
+						list.map((item, index) => {
+							item.element = data[index]
+							return item
+						})
+						let top = list[this.contentIndex].element.top
+						uni.pageScrollTo({
+							scrollTop: top,
+						})
+					}).exec()
 				}
 			},
 			// 获取浏览记录
-			getHistoryView(id) {
+			getHistoryView() {
 				let list = uni.getStorageSync("viewRecord")
 				list = list.find(val => {
-					return val.id == id
+					return val.id == this.bookId
 				})
-				this.read_progress = list.progress
+				// this.read_progress = list.progress
 				this.readHabit = list.read_habit
-				this.historyValue = list.progress_value
-				this.getData(id)
+				this.contentIndex = list.progress_value
+				this.getData()
 			},
 			// 获取数据
-			getData(id) {
-				uniCloud.callFunction({
-					name: 'get',
-					data: {
-						action: "getBookContent",
-						params: {
-							id,
-						}
-					}
+			getData() {
+				this.$http.request('get/getBookInfo', {
+					id: this.bookId
 				}).then(res => {
-					this.info = res.result.data
+					this.bookInfo = res.data
 					uni.setNavigationBarTitle({
-						title: this.info.title
+						title: this.bookInfo.title
 					})
+				})
+				this.$http.request('get/getBookContent', {
+					book_id: this.bookId,
+					page: 1,
+					limit: 999,
+				}).then(res => {
+					this.bookContent = res.data
+					this.total = res.total
 					uni.showLoading({
-						title:"内容加载中..."
+						title: "内容加载中..."
 					})
 					this.$nextTick(() => {
 						uni.hideLoading()
@@ -176,8 +192,9 @@
 					_id,
 					cover,
 					author,
-					title
-				} = this.info
+					title,
+				} = this.bookInfo
+				let total = this.total
 				let data = {
 					id: _id,
 					cover,
@@ -186,7 +203,17 @@
 				}
 				data.read_habit = this.readHabit
 				data.progress = this.read_progress
-				data.progress_value = this.readHabit == 'scroll' ? this.viewProgress : this.contentIndex
+				if (this.readHabit == 'scroll') {
+					let scroll = this.systemInfo.screenHeight / 2 + this.pageScroll
+					let index = this.bookContent.findIndex(item => {
+						if (scroll > item.element.top && scroll < item.element.bottom) {
+							return item
+						}
+					})
+					this.contentIndex = index
+				}
+				data.progress_title = this.bookContent[this.contentIndex].title
+				data.progress_value = this.contentIndex
 				if (list) {
 					let index = ''
 					for (let i in list) {
@@ -209,7 +236,7 @@
 			swiperContent(e) {
 				this.contentIndex = e.detail.current
 				let index = e.detail.current + 1
-				let length = this.info.list.length
+				let length = this.total
 				this.read_progress = index / length
 				this.saveViewRecord()
 			},

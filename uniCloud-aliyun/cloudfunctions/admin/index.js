@@ -4,6 +4,8 @@ const {
 	verifyToken
 } = require("wx-common");
 const db = uniCloud.database()
+let userInfo;
+const createTime = new Date().getTime()
 exports.main = async (event, context) => {
 	//UNI_WYQ:这里的uniID换成新的，保证多人访问不会冲突
 	uniID = uniID.createInstance({
@@ -16,12 +18,34 @@ exports.main = async (event, context) => {
 	if (payload.code && payload.code > 0) {
 		return payload
 	}
+	userInfo = payload.userInfo
 	switch (event.action) {
+		case 'addBookInfo': {
+			return addBookInfo(event.params)
+		}
+		case 'addTopic': {
+			return addTopic(event.params)
+		}
+		case 'addVersion': {
+			return addVersion(event.params)
+		}
+		case 'addLabel': {
+			return addLabel(event.params)
+		}
 		case 'editBookInfo': {
 			return editBookInfo(event.params)
 		}
 		case 'addBookContent': {
 			return addBookContent(event.params)
+		}
+		case 'getBookContent': {
+			return getBookContent(event.params)
+		}
+		case 'editBookContent': {
+			return editBookContent(event.params)
+		}
+		case 'deleteBookContent': {
+			return deleteBookContent(event.params)
 		}
 		case 'editAbout': {
 			return editAbout(event.params)
@@ -67,6 +91,92 @@ exports.main = async (event, context) => {
 		}
 	}
 }
+// 添加标签
+async function addLabel(event) {
+	let {
+		name,
+	} = event
+	const collection = db.collection('labelList')
+	let res = await collection.add({
+		name,
+		createTime,
+	})
+	return {
+		code: 200,
+		msg: '新增成功!',
+	}
+}
+// 添加版本描述
+async function addVersion(event) {
+	let {
+		version,
+		desc,
+	} = event
+	const collection = db.collection('version')
+	let res = await collection.add({
+		version,
+		versionNum: version.replace(/./g, ""),
+		desc,
+		createTime,
+	})
+	return {
+		code: 200,
+		msg: '新增成功!',
+	}
+}
+// 添加题目
+async function addTopic(event) {
+	let {
+		title,
+		type,
+		label,
+		option,
+		answer,
+		level,
+	} = event
+	const collection = db.collection('topicList')
+	let res = await collection.add({
+		title,
+		type,
+		label: label.split(','),
+		option,
+		answer,
+		creater: userInfo.username,
+		level,
+		createTime,
+	})
+	return {
+		code: 200,
+		msg: '新增成功!',
+	}
+}
+// 添加资料信息
+async function addBookInfo(event) {
+	let {
+		cover,
+		author,
+		creater,
+		title,
+		type,
+		origin,
+	} = event
+	const collection = db.collection('bookList')
+	let res = await collection.add({
+		cover,
+		author,
+		creater: userInfo.username,
+		title,
+		type,
+		origin,
+		createTime,
+		list: []
+	})
+	console.log(JSON.stringify(res))
+	return {
+		code: 200,
+		msg: '新增成功!',
+	}
+}
 
 // 删除模拟面试问题
 async function deleteSimulationTopic(event) {
@@ -108,6 +218,16 @@ async function editSimulationTopic(event) {
 	let id = params._id
 	delete params._id
 	const collection = db.collection('simulation-topic')
+	let isHas = await collection.where({
+		text: params.text,
+		key: params.key
+	}).get()
+	if (isHas.data[0]._id != id) {
+		return {
+			code: 400,
+			msg: '已存在相同问题!',
+		}
+	}
 	let res = await collection.doc(id).update(params)
 	return {
 		code: 200,
@@ -150,6 +270,16 @@ async function addSimulationTopic(event) {
 		}
 	}
 	const collection = db.collection('simulation-topic')
+	let isHas = await collection.where({
+		text: params.text,
+		key: params.key
+	}).count()
+	if (isHas.total > 0) {
+		return {
+			code: 400,
+			msg: '已存在相同问题!',
+		}
+	}
 	let res = await collection.add(params)
 	return {
 		code: 200,
@@ -345,14 +475,60 @@ async function editBookInfo(event) {
 	}
 }
 
-async function addBookContent(event) {
+/* 
+ * 资料内容部分
+ */
+
+async function deleteBookContent(event) {
 	let {
-		_id,
-		list
+		id
 	} = event
-	const collection = db.collection('bookList')
-	let res = await collection.doc(_id).update({
-		list,
+	const collection = db.collection('book-content')
+	let res = await collection.doc(id).remove()
+	return {
+		code: 200,
+		msg: '删除成功!',
+	}
+}
+
+async function editBookContent(event) {
+	let {
+		id,
+		title,
+		content
+	} = event
+	const collection = db.collection('book-content')
+	let res = await collection.doc(id).update({
+		title,
+		content
+	})
+	return {
+		code: 200,
+		msg: '修改成功!',
+	}
+}
+
+
+async function addBookContent(event) {
+	console.log(event);
+	let {
+		book_id,
+		title,
+		content
+	} = event
+	if (!title || !content) {
+		return {
+			code: 400,
+			msg: "请填写标题或内容!"
+		}
+	}
+	const collection = db.collection('book-content')
+	let res = await collection.add({
+		book_id,
+		title,
+		content,
+		creator: userInfo.username,
+		create_time: createTime,
 	})
 	return {
 		code: 200,
