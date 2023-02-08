@@ -35,7 +35,7 @@
 			<!-- 面试题 -->
 			<view class="info-block">
 				<view class="info-block__top">
-					<view class="info-block__top__title">面试题</view>
+					<view class="info-block__top__title">练习题</view>
 					<view class="info-block__top__switch" @click="getTopicList">换一题</view>
 				</view>
 				<view v-if="topicData.title" class="interview-block fade-in-bottom">

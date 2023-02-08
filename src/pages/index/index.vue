@@ -55,7 +55,7 @@
 						value: "database"
 					},
 					{
-						title: "面试题",
+						title: "练习题",
 						value: "interview"
 					},
 					{

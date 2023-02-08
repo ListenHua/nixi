@@ -56,7 +56,7 @@
 		{
 			"path": "pages/topic/create",
 			"style": {
-				"navigationBarTitleText": "创建面试题"
+				"navigationBarTitleText": "创建练习题"
 			}
 		}
 	    ,{
