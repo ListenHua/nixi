@@ -21,7 +21,9 @@
 		<view class="data-list" v-if="readHabit=='scroll'">
 			<view class="block line" v-for="(item,index) in bookContent" :key="index">
 				<view class="title">{{item.title}}</view>
-				<uni-parse :content="item.content"></uni-parse>
+				<!-- <uni-parse :content="item.content"></uni-parse> -->
+				<mp-html :content="item.content" />
+					<mp-html :content="testContent" />
 			</view>
 		</view>
 		<swiper v-if="readHabit=='swiper'" class="data-list" :current="contentIndex"
@@ -29,7 +31,9 @@
 			<swiper-item class="block" v-for="(item,index) in bookContent" :key="index">
 				<scroll-view scroll-y :style="{'height':screenHeight+'px'}">
 					<view class="title">{{item.title}}</view>
-					<uni-parse :content="item.content"></uni-parse>
+					<!-- <uni-parse :content="item.content"></uni-parse> -->
+					<mp-html :content="testContent" />
+					<!-- <mp-html :content="item.content" /> -->
 					<view style="width: 100%;height: 20rpx;"></view>
 				</scroll-view>
 			</swiper-item>
@@ -40,9 +44,11 @@
 <script>
 	var timer;
 	import uniParse from '@/uni_modules/uni-parse/parse'
+	import mpHtml from '@/components/mp-html/mp-html'
 	export default {
 		components: {
-			uniParse
+			uniParse,
+			mpHtml
 		},
 		data() {
 			return {
