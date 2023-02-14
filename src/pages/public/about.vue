@@ -1,15 +1,11 @@
 <template>
 	<view class="page-content">
-		<uni-parse :content="content"></uni-parse>
+		<n-html :content="content"></n-html>
 	</view>
 </template>
 
 <script>
-	import uniParse from '@/uni_modules/uni-parse/parse'
  	export default {
-		components:{
-			uniParse
-		},
 		data() {
 			return {
 				content: '',

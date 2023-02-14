@@ -7,7 +7,7 @@
 			<view class="interview-block__info__tag" v-for="(items,index) in item.label">{{items}}</view>
 		</view>
 		<view class="interview-block__title">
-			<uni-parse :content='item.title'></uni-parse>
+			<n-html :content='item.title'></n-html>
 		</view>
 		<!-- 选项或答案区 -->
 		<template v-if="answer">
@@ -15,20 +15,20 @@
 			<view class="interview-block__checkbox" v-if="item.type===0">
 				<view class="interview-block__option" :class="[answerShowClass(item,items)]"
 					v-for="(items,i) in item.option" @click="selectAnswer(index,i)">
-					<uni-parse :content='items.content'></uni-parse>
+					<n-html :content='items.content'></n-html>
 				</view>
 			</view>
 			<!-- 单选 -->
 			<view class="interview-block__checkbox" v-else-if="item.type===1">
 				<view class="interview-block__option" :class="[answerShowClass(item,items)]"
 					v-for="(items,i) in item.option" @click="selectAnswer(index,i)">
-					<uni-parse :content='items.content'></uni-parse>
+					<n-html :content='items.content'></n-html>
 				</view>
 			</view>
 			<!-- 答案 -->
 			<view class="interview-block__text" v-else-if="item.type===2" v-show="item.show">
 				<view class="interview-block__text__content">
-					<uni-parse :content='item.answer'></uni-parse>
+					<n-html :content='item.answer'></n-html>
 				</view>
 			</view>
 		</template>
@@ -58,11 +58,7 @@
 </template>
 
 <script>
-	import uniParse from '@/uni_modules/uni-parse/parse'
 	export default {
-		components: {
-			uniParse
-		},
 		name: "topic-item",
 		props: {
 			item: {

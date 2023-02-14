@@ -4,7 +4,7 @@
 			<view class="step-block" v-for="(item,index) in versionList" :key="index">
 				<view class="step-block__version">{{item.version}}</view>
 				<view class="step-block__desc">
-					<uni-parse :content="item.desc"></uni-parse>
+					<n-html :content="item.desc"></n-html>
 				</view>
 			</view>
 		</view>
@@ -12,11 +12,7 @@
 </template>
 
 <script>
-	import uniParse from '@/uni_modules/uni-parse/parse'
  	export default {
-		components:{
-			uniParse
-		},
 		data() {
 			return {
 				versionList: [],
