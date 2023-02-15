@@ -30,6 +30,9 @@
 	import RecordView from './components/record.vue'
 	import InterviewView from './components/interview.vue'
 	import MainView from './components/main.vue'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		components: {
 			DatabaseView,
@@ -39,12 +42,7 @@
 		},
 		data() {
 			return {
-				pageParams: {
-					main: '',
-					minor: ''
-				},
 				searchValue: '',
-				menuShow: false,
 				tabList: [{
 						title: "首页",
 						value: "main"
@@ -74,6 +72,12 @@
 				startParams: '',
 				pageLoad: false,
 			}
+		},
+		computed: {
+			...mapState({
+				menuShow: state => state.home.menuShow,
+				pageParams: state => state.home.page
+			})
 		},
 		created() {
 			this.pageParams = {

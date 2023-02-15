@@ -1,25 +1,22 @@
 import {
 	className
 } from '@/utils/index.js'
+import {
+	mapState
+} from 'vuex'
 const mixins = {
-	props: {
-		menuShow: {
-			type: Boolean,
-			default: false,
-		},
-		page: {
-			type: Object,
-			default: () => {
-				main: '';
-				minor: ''
-			}
-		}
-	},
 	data() {
 		return {
-			zIndex: 30,
-			className: '',
+
 		}
+	},
+	computed: {
+		...mapState({
+			zIndex: state => state.home.zIndex,
+			className: state => state.home.className,
+			menuShow: state => state.home.menuShow,
+			page: state => state.home.page
+		})
 	},
 	mounted() {
 		this.checkPage()
