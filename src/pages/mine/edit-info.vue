@@ -59,7 +59,6 @@
 	export default {
 		data() {
 			return {
-				userInfo: '',
 				titleStyle: {
 					fontSize: '28rpx',
 					color: "#000",
@@ -69,9 +68,6 @@
 				modNamePop: false,
 				modifyNameText: '',
 			}
-		},
-		onLoad() {
-			this.userInfo = uni.getStorageSync('userInfo')
 		},
 		methods: {
 			roleName(role) {
@@ -121,18 +117,12 @@
 									type: 'success',
 									duration: 1500,
 								})
-								this.getInfo()
-								uni.$emit("refreshUserInfo")
+								this.$store.dispatch('updateUserInfo', {
+									_this: this
+								})
 							})
 						})
 					}
-				})
-			},
-			// 获取用信息
-			getInfo() {
-				this.$http.request('user/getInfo').then(res => {
-					this.userInfo = res.data
-					uni.setStorageSync('userInfo', res.data)
 				})
 			},
 			// 修改昵称
@@ -150,10 +140,11 @@
 						type: 'success',
 						duration: 1500,
 					})
-					uni.$emit("refreshUserInfo")
-					this.getInfo()
 					this.modNamePop = false
 					this.modifyNameText = ''
+					this.$store.dispatch('updateUserInfo', {
+						_this: this
+					})
 				})
 			},
 			// 更换背景图
@@ -184,8 +175,9 @@
 									type: 'success',
 									duration: 1500,
 								})
-								this.getInfo()
-								uni.$emit("refreshUserInfo")
+								this.$store.dispatch('updateUserInfo', {
+									_this: this
+								})
 							})
 						})
 					}
@@ -205,8 +197,9 @@
 									type: 'success',
 									duration: 1500,
 								})
-								this.getInfo()
-								uni.$emit("refreshUserInfo")
+								this.$store.dispatch('updateUserInfo', {
+									_this: this
+								})
 							})
 
 						}

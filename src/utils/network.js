@@ -1,3 +1,4 @@
+import store from '@/store/index.js'
 export default class {
 
 	constructor() {
@@ -50,6 +51,7 @@ export default class {
 								uni.setStorageSync('userInfo', res.result.data.userInfo)
 								_this.network.isLogin = true;
 								this.network.running = false;
+								store.dispatch('setUserInfo')
 								resolve()
 							})
 							.catch(res => {

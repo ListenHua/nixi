@@ -1,10 +1,6 @@
 <script>
 	export default {
-		globalData: {
-			systemInfo: ''
-		},
 		onLaunch: function() {
-			this.$options.globalData.systemInfo = uni.getSystemInfoSync()
 			this.$http.request('get/systemData', {
 				type: 'simulation'
 			}).then(res => {

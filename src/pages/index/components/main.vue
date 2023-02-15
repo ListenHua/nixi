@@ -6,16 +6,13 @@
 			<view class="user-info">
 				<view class="welcome-text">
 					<view class="text">Welcome</view>
-					<view class="name text-focus-in" v-if="isLogin" @click="navigateTo('/pages/mine/user-center')">
+					<view class="name text-focus-in" @click="navigateTo('/pages/mine/user-center')">
 						{{userInfo.nickName}}
 					</view>
-					<view class="login-text" v-else @click="getInfo">点击登录</view>
 				</view>
-				<image v-if="isLogin" class="avatar shadow-drop-center" :src="userInfo.avatarUrl" mode="aspectFill"
+				<image class="avatar shadow-drop-center" :src="userInfo.avatarUrl" mode="aspectFill"
 					@click="navigateTo('/pages/mine/user-center')">
 				</image>
-				<image v-else class="avatar shadow-drop-center" src="/static/images/logo.png" mode="aspectFill"
-					@click="getInfo"></image>
 			</view>
 			<!-- 资料库 -->
 			<view class="info-block" style="overflow: hidden;">
@@ -59,8 +56,6 @@
 		mixins: [mixin],
 		data() {
 			return {
-				userInfo: {},
-				isLogin: false,
 				bookList: [],
 				topicData: {},
 			}
@@ -71,27 +66,11 @@
 			},
 		},
 		mounted() {
-			uni.$off('refreshUserInfo')
-			uni.$on('refreshUserInfo', () => {
-				this.getInfo()
-			})
-			console.log("加载main")
-			this.getInfo()
 			this.getTopicList()
 			this.getBookList()
 			this.checkPage()
 		},
 		methods: {
-			// 更新用户信息
-			updateInfo() {
-				this.$http._login()
-				let info = uni.getStorageSync('userInfo')
-				if (info) {
-					this.userInfo = info
-					this.isLogin = true
-					uni.$emit("userLogin")
-				}
-			},
 			// 显示答案
 			showAnswer(index) {
 				let data = this.topicData
@@ -130,14 +109,6 @@
 			toLogin() {
 				uni.navigateTo({
 					url: '/pages/login/login'
-				})
-			},
-			// 获取用信息
-			async getInfo() {
-				this.$http.request('user/getInfo').then(res => {
-					this.userInfo = res.data
-					this.isLogin = true
-					uni.setStorageSync('userInfo', res.data)
 				})
 			},
 			// 获取推荐资料库

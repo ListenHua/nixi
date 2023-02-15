@@ -17,10 +17,8 @@ const mixins = {
 	},
 	data() {
 		return {
-			filterShow: false,
 			zIndex: 30,
 			className: '',
-			systemInfo: getApp().globalData.systemInfo,
 		}
 	},
 	mounted() {
@@ -34,11 +32,6 @@ const mixins = {
 		},
 		switchInPage() {
 			this.$emit("switch", this.$options.name)
-		},
-		jumpUrl(url) {
-			uni.navigateTo({
-				url
-			})
 		}
 	}
 }

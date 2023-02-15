@@ -45,7 +45,6 @@
 				},
 				searchValue: '',
 				menuShow: false,
-				systemInfo: getApp().globalData.systemInfo,
 				tabList: [{
 						title: "首页",
 						value: "main"
@@ -65,6 +64,10 @@
 					{
 						title: "浏览记录",
 						value: "record"
+					},
+					{
+						title: "我的",
+						value: "mine"
 					},
 				],
 				testData: '',
@@ -145,14 +148,23 @@
 			},
 			// 菜单栏操作
 			switchFuc(val) {
-				// 查看历史浏览刷新数据
-				if (val == 'record') this.$refs.record.refresh()
-				// 跳转去模拟面试
-				if (val == 'simulation') {
-					this.navigateTo('/pages/modules/simulation/index')
-					return
+				switch (val) {
+					case 'record':
+						this.$refs.record.refresh()
+						this.switchPage(val)
+						break;
+					case 'simulation':
+						this.menuShow = false
+						this.navigateTo('/pages/modules/simulation/index')
+						break;
+					case 'mine':
+						this.menuShow = false
+						this.navigateTo('/pages/mine/user-center')
+						break;
+					default:
+						this.switchPage(val)
+						break;
 				}
-				this.switchPage(val)
 			},
 		}
 	}

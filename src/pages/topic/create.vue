@@ -190,7 +190,7 @@
 
 				await this.getImageInfo(code, 'code')
 				await this.getImageInfo(cover, 'cover')
-				await this.getImageInfo(uni.getStorageSync('userInfo').avatarUrl, 'avatar')
+				await this.getImageInfo(this.userInfo.avatarUrl, 'avatar')
 				uni.showLoading({
 					title: "生成中...",
 					mask: true
@@ -198,7 +198,7 @@
 				this.initCanvas()
 			},
 			initCanvas() {
-				let userInfo = uni.getStorageSync('userInfo')
+				let userInfo = this.userInfo
 				let width = this.canvasWidth
 				let height = this.canvasHeight
 				var ctx = uni.createCanvasContext('qrcode')

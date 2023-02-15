@@ -1,6 +1,7 @@
 <template>
 	<view class="page-content">
 		<view class="user-info" v-if="userInfo">
+			<image class="bg-img" :src="userInfo.background" mode="aspectFill"></image>
 			<view class="head" @click="navigateTo('/pages/mine/edit-info')">
 				<image class="head-avatar" :src="userInfo.avatarUrl" mode="aspectFill"></image>
 				<view class="head-level">{{userInfo.level}}</view>
@@ -9,10 +10,6 @@
 				<view class="name">{{userInfo.nickName}}</view>
 				<view class="id">ID：{{userInfo.id}}</view>
 			</view>
-		</view>
-		<view class="cell-group">
-			<u-cell title="修改资料" @click="navigateTo('/pages/mine/edit-info')"></u-cell>
-			<u-cell :border="false" title="清除阅读习惯" @click="clearReadHabit"></u-cell>
 		</view>
 		<view class="cell-group">
 			<u-cell title="创建的考卷" @click="navigateTo('/pages/mine/my-create-exam')"></u-cell>
@@ -43,11 +40,8 @@
 	export default {
 		data() {
 			return {
-				userInfo: '',
+
 			}
-		},
-		onShow() {
-			this.userInfo = uni.getStorageSync('userInfo')
 		},
 		methods: {
 			// 清除阅读习惯
@@ -78,12 +72,25 @@
 			box-sizing: border-box;
 			width: 100%;
 			border-radius: 16rpx;
+			position: relative;
+
+			.bg-img {
+				position: absolute;
+				z-index: 1;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				filter: blur(2px) opacity(0.3);
+				background-color: #fff;
+			}
 
 			.head {
 				width: 160rpx;
 				height: 160rpx;
 				margin-right: 30rpx;
 				position: relative;
+				z-index: 5;
 
 				&-avatar {
 					width: 160rpx;
@@ -111,7 +118,10 @@
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
+				align-items: center;
 				height: 140rpx;
+				position: relative;
+				z-index: 5;
 
 				.name {
 					font-size: 48rpx;
@@ -156,6 +166,20 @@
 			font-size: 28rpx;
 			color: #333;
 			font-weight: bold;
+		}
+	}
+
+	.cell-text {
+		position: relative;
+
+		button {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			opacity: 0;
+			z-index: 1;
 		}
 	}
 </style>

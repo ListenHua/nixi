@@ -1,39 +1,14 @@
 <template>
 	<view class="page-content">
-		<u-notify ref="uTips"></u-notify>
 		<view class="progress-box">
 			<view class="progress" :style="{'width':read_progress*100+'%'}"></view>
 		</view>
-		<view class="read-habit" v-show="habitPop" @touchmove.stop>
-			<view class="blur-layer"></view>
-			<view class="pop">
-				<view class="title">请选择您的阅读习惯</view>
-				<view class="button" @click="readHabitChose('swiper')">
-					<image class="icon" src="/static/images/swiper-icon.svg"></image>
-					<text class="text">左右滑动查看</text>
-				</view>
-				<view class="button" @click="readHabitChose('scroll')">
-					<image class="icon" src="/static/images/scroll-icon.svg"></image>
-					<text class="text">上下滑动查看</text>
-				</view>
-			</view>
-		</view>
-		<view class="data-list" v-if="readHabit=='scroll'">
+		<view class="data-list">
 			<view class="block line" v-for="(item,index) in bookContent" :key="index">
-				<view class="title">{{item.title}}</view>
+				<view class="title" :class="{'sticky':contentIndex==index}">{{item.title}}</view>
 				<n-html :content="item.content"></n-html>
 			</view>
 		</view>
-		<swiper v-if="readHabit=='swiper'" class="data-list" :current="contentIndex"
-			:style="{'height':screenHeight+'px'}" @change="swiperContent">
-			<swiper-item class="block" v-for="(item,index) in bookContent" :key="index">
-				<scroll-view scroll-y :style="{'height':screenHeight+'px'}">
-					<view class="title">{{item.title}}</view>
-					<n-html :content="item.content"></n-html>
-					<view style="width: 100%;height: 20rpx;"></view>
-				</scroll-view>
-			</swiper-item>
-		</swiper>
 	</view>
 </template>
 
@@ -44,13 +19,10 @@
 			return {
 				bookInfo: "",
 				bookContent: [],
-				systemInfo: getApp().globalData.systemInfo,
 				scrollHeight: "",
 				screenHeight: "",
 				contentIndex: 0, // 滑动浏览下标
 				read_progress: 0,
-				habitPop: false,
-				readHabit: 'scroll',
 				pageScroll: 0,
 				autoSaveFunction: "",
 				bookId: '',
@@ -60,18 +32,25 @@
 			}
 		},
 		onPageScroll(e) {
-			if (this.readHabit == 'scroll') {
-				let system = this.systemInfo
-				let scroll = e.scrollTop
-				let height = this.scrollHeight - system.screenHeight + system.statusBarHeight + 44
-				this.pageScroll = scroll
-				this.read_progress = scroll / height
-				clearTimeout(timer)
+			let system = this.systemInfo
+			let scroll = e.scrollTop
+			let height = this.scrollHeight - system.screenHeight + system.statusBarHeight + 44
+			this.pageScroll = scroll
+			this.read_progress = scroll / height
+			clearTimeout(timer)
 
-				timer = setTimeout(() => {
-					this.saveViewRecord()
-				}, 500);
-			}
+			// let viewScroll = this.systemInfo.screenHeight / 2 + this.pageScroll
+			let index = this.bookContent.findIndex(item => {
+				if (scroll >= item.element.top && scroll < item.element.bottom) {
+					return item
+				}
+			})
+			this.contentIndex = index
+			console.log('scroll', index);
+
+			timer = setTimeout(() => {
+				this.saveViewRecord()
+			}, 500);
 		},
 		onLoad(option) {
 			let system = this.systemInfo
@@ -81,16 +60,9 @@
 			if (option.type == 'history') {
 				this.getHistoryView()
 			} else if (option.type == 'share') {
-				this.readHabit = option.habit
 				this.historyValue = option.value
 				this.getData()
 			} else {
-				let readHabit = uni.getStorageSync('readHabit')
-				if (readHabit) {
-					this.readHabit = readHabit
-				} else {
-					this.habitPop = true
-				}
 				this.getData()
 			}
 		},
@@ -99,11 +71,10 @@
 		},
 		onShareAppMessage() {
 			let info = this.bookInfo
-			let habit = this.readHabit
 			let value = this.contentIndex
 			return {
 				title: info.title,
-				path: `pages/detail/viewDetail?id=${info._id}&type=share&habit=${habit}&value=${value}`,
+				path: `pages/detail/viewDetail?id=${info._id}&type=share&value=${value}`,
 				imageUrl: info.cover,
 				desc: '',
 				content: '',
@@ -120,23 +91,19 @@
 			},
 			async queryContentHeight() {
 				let list = this.bookContent
-				if (this.readHabit == 'swiper') {
-					this.read_progress = (this.contentIndex + 1) / this.total
-				} else {
-					let scrollHeight = await this.getNodeHeight('.page-content')
-					this.scrollHeight = scrollHeight.height
-					const query = uni.createSelectorQuery().in(this)
-					query.selectAll('.block').boundingClientRect((data) => {
-						list.map((item, index) => {
-							item.element = data[index]
-							return item
-						})
-						let top = list[this.contentIndex].element.top
-						uni.pageScrollTo({
-							scrollTop: top,
-						})
-					}).exec()
-				}
+				let scrollHeight = await this.getNodeHeight('.page-content')
+				this.scrollHeight = scrollHeight.height
+				const query = uni.createSelectorQuery().in(this)
+				query.selectAll('.block').boundingClientRect((data) => {
+					list.map((item, index) => {
+						item.element = data[index]
+						return item
+					})
+					let top = list[this.contentIndex].element.top
+					uni.pageScrollTo({
+						scrollTop: top,
+					})
+				}).exec()
 			},
 			// 获取浏览记录
 			getHistoryView() {
@@ -144,8 +111,6 @@
 				list = list.find(val => {
 					return val.id == this.bookId
 				})
-				// this.read_progress = list.progress
-				this.readHabit = list.read_habit
 				this.contentIndex = list.progress_value
 				this.getData()
 			},
@@ -197,17 +162,7 @@
 					author,
 					title
 				}
-				data.read_habit = this.readHabit
 				data.progress = this.read_progress
-				if (this.readHabit == 'scroll') {
-					let scroll = this.systemInfo.screenHeight / 2 + this.pageScroll
-					let index = this.bookContent.findIndex(item => {
-						if (scroll > item.element.top && scroll < item.element.bottom) {
-							return item
-						}
-					})
-					this.contentIndex = index
-				}
 				data.progress_title = this.bookContent[this.contentIndex].title
 				data.progress_value = this.contentIndex
 				if (list) {
@@ -243,17 +198,6 @@
 					current: index
 				})
 			},
-			// 阅读习惯选择
-			readHabitChose(type) {
-				uni.setStorageSync('readHabit', type)
-				this.readHabit = type
-				this.habitPop = false
-				this.$refs.uTips.show({
-					message: '设置成功，如想修改阅读习惯可在首页菜单中的设置修改',
-					type: 'success',
-					duration: '3000',
-				})
-			},
 		}
 	}
 </script>
@@ -267,7 +211,7 @@
 			width: 100%;
 			height: 6rpx;
 			background-color: transparent;
-			z-index: 1;
+			z-index: 2;
 
 			.progress {
 				background: linear-gradient(to right, $color-main, $color-second, $color-shallow);
@@ -303,12 +247,22 @@
 				box-sizing: border-box;
 
 				.title {
+					width: 100%;
 					font-size: 36rpx;
 					font-weight: bold;
 					padding: 30rpx 0;
 					border-bottom: 2rpx solid #ccc;
 					margin-bottom: 30rpx;
 					word-break: break-all;
+					background-color: #fff;
+				}
+
+				.sticky {
+					width: 100%;
+					position: sticky;
+					top: 0;
+					z-index: 9;
+					z-index: 1;
 				}
 
 				.content {
@@ -339,55 +293,6 @@
 							width: 100%;
 						}
 					}
-				}
-			}
-		}
-	}
-
-	.read-habit {
-		.pop {
-			position: fixed;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			width: 500rpx;
-			height: 400rpx;
-			border-radius: 16rpx;
-			margin: auto;
-			z-index: 12000;
-			background-color: #FFFFFF;
-			padding: 40rpx;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.4);
-
-			.title {
-				font-size: 28rpx;
-				font-weight: bold;
-			}
-
-			.button {
-				width: 400rpx;
-				height: 88rpx;
-				background: linear-gradient(to right, $color-main, $color-second, $color-shallow);
-				border-radius: 16rpx;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				margin-top: 40rpx;
-
-				.icon {
-					width: 60rpx;
-					height: 60rpx;
-					margin-right: 40rpx;
-				}
-
-				.text {
-					font-size: 28rpx;
-					font-weight: bold;
-					color: $text-color-inverse;
 				}
 			}
 		}

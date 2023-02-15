@@ -30,12 +30,6 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		},
-		{
 			"path": "pages/public/version",
 			"style": {
 				"navigationBarTitleText": "版本描述"

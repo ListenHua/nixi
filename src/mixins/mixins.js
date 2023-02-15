@@ -1,3 +1,6 @@
+import {
+	mapState
+} from 'vuex'
 const systemInfo = {
 	filters: {
 
@@ -6,6 +9,7 @@ const systemInfo = {
 		return {
 			system: uni.getSystemInfoSync(),
 			statusBarHeight: uni.getSystemInfoSync().statusBarHeight,
+			systemInfo: uni.getSystemInfoSync(),
 			share: {
 				title: '匿习',
 				path: 'pages/index/index',
@@ -13,11 +17,12 @@ const systemInfo = {
 				desc: '学习工具',
 				content: '',
 			},
-			userInfo: '',
 		}
 	},
-	onShow() {
-		this.userInfo = uni.getStorageSync('userInfo')
+	computed: {
+		...mapState({
+			userInfo: state => state.user.userInfo,
+		})
 	},
 	onLoad() {},
 	onShareTimeline() {
@@ -77,7 +82,7 @@ const systemInfo = {
 			let routes = getCurrentPages()
 			if (routes.length <= 1) {
 				uni.reLaunch({
-					url:'/pages/index/index'
+					url: '/pages/index/index'
 				})
 			} else {
 				uni.navigateBack({
