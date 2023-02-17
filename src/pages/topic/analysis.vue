@@ -55,6 +55,15 @@
 				nodata: false,
 			}
 		},
+		onShareAppMessage() {
+			let titleAry = ["我有道题想让你帮看一下", "答案为什么是这个啊？", "啊？什么原理？", "急！救救救"]
+			let titleIndex = Math.floor((Math.random() * titleAry.length))
+			return {
+				title: titleAry[titleIndex],
+				path: `pages/topic/analysis?id=${this.id}`,
+				imageUrl: 'https://mp-54f1765b-5282-47cf-8405-d6f9ccf838c3.cdn.bspapp.com/cloudstorage/602b8175-a169-413a-9382-65141b80623d.png',
+			}
+		},
 		onLoad(option) {
 			this.id = option.id
 			this.getData();
