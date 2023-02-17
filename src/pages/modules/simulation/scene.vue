@@ -11,7 +11,8 @@
 		</view>
 		<view class="answer" v-if="talker=='me'">
 			<template v-if="startAnswer">
-				<textarea v-model="answerText" auto-focus auto-height placeholder="如心有答案,可空白提交"></textarea>
+				<textarea v-model="answerText" auto-focus auto-height placeholder="如心有答案,可空白提交"
+					:placeholder-style="{color:'#fff'}"></textarea>
 				<view class="question__bottom">
 					<n-button width="160rpx" height="68rpx" fontSize="24" @click.stop="submit">提交</n-button>
 				</view>
@@ -29,12 +30,14 @@
 	export default {
 		data() {
 			return {
+				scenceKey: '',
 				simulationConfig: '',
 				talking: false, // 是否正在谈话
 				talker: '', // 正在说话的人物
 				talkText: '', // 说话的内容
 				answerText: '', // 输入的回答内容
 				buttonText: '', // 按钮文本
+				recordAry: [],
 				startAnswer: false, // 是否在回答
 
 				interviewStep: 0, // 进行的步骤
@@ -62,7 +65,15 @@
 				skipTimeout: '',
 			}
 		},
+		onShareAppMessage() {
+			return {
+				title: this.userInfo.nickName + "邀请你参加模拟面试",
+				path: `pages/modules/simulation/scene?key=${this.scenceKey}`,
+				imageUrl: 'https://mp-54f1765b-5282-47cf-8405-d6f9ccf838c3.cdn.bspapp.com/cloudstorage/1c69d5f8-18ac-4326-a5ab-facac4883ab1.png',
+			}
+		},
 		onLoad(option) {
+			this.scenceKey = option.key
 			this.simulationConfig = uni.getStorageSync('simulationConfig')
 			// if (!uni.getStorageSync('viewSimulation')) {
 			// 	this.interviewTalk.push({
@@ -76,14 +87,14 @@
 			this.talker = 'none'
 			this.talkText = this.simulationConfig.loading_text
 			setTimeout(() => {
-				this.getTopic(option.key)
+				this.getTopic()
 			}, 500)
 		},
 		methods: {
 			// 获取模拟试题
-			getTopic(key) {
+			getTopic() {
 				let params = {
-					key
+					key: this.scenceKey
 				}
 				this.$http.request('get/simulationTopic', params).then(res => {
 					let data = res.data
@@ -114,30 +125,51 @@
 			},
 			// 回答问题
 			next() {
-				let data = this.interviewTalk
-				let step = this.interviewStep
-				if (data[step].type == 'talk') {
+				let type = this.interviewTalk[this.interviewStep].type
+				if (type == 'talk') {
 					this.interviewStep += 1
 					uni.setStorageSync('viewSimulation', true)
 					this.talkTo()
-				} else if (data[step].type == 'ask') {
+				} else if (type == 'ask') {
 					this.talker = 'me'
 					this.startAnswer = true
-				} else if (data[step].type == 'over') {
+				} else if (type == 'over') {
 					this.navigaBack()
+				} else if (type == 'reset') {
+					this.submit()
 				}
 			},
-			submit() {
+			async submit() {
 				let ary = this.simulationConfig.unknow_key_word
 				let answer = this.answerText
-
+				let data = this.interviewTalk[this.interviewStep]
+				if (data.type == 'ask') {
+					let obj = {
+						question: data.text,
+						answer,
+					}
+					this.recordAry.push(obj)
+				}
+				console.log('array', this.recordAry);
 				// 判断是否已结束
 				if (this.interviewStep == this.interviewTalk.length - 1) {
-					this.interviewTalk.push({
-						text: this.simulationConfig.over_text,
-						talker: "hr",
-						type: "over",
-						button: "结束面试"
+					await this.$http.request('add/simulationRecord', {
+						key: this.scenceKey,
+						data: this.recordAry
+					}).then(res => {
+						this.interviewTalk.push({
+							text: this.simulationConfig.over_text,
+							talker: "hr",
+							type: "over",
+							button: "结束面试"
+						})
+					}).catch(res => {
+						this.interviewTalk.push({
+							text: '非常抱歉，记录出错',
+							talker: "hr",
+							type: "reset",
+							button: "重新提交"
+						})
 					})
 				}
 

@@ -2,9 +2,11 @@
 	<view style="padding-bottom: 50rpx;">
 		<view class="paper">
 			<view class="paper-block" :class="item.className" v-for="(item,index) in list" :key="item._id"
-				@click="navigateTo(`/pages/topic/exam?id=${item._id}&type=view`)">
-				<view class="paper-block__title">{{item.title}}</view>
-				<image class="paper-block__qrcode" :src="item.qrcode" mode="widthFix"></image>
+				@click="navigateTo(`/pages/modules/simulation/record-detail?id=${item._id}`)">
+				<view class="paper-block__title">{{item.simulation.title}}</view>
+				<view class="paper-block__list">
+					<view class="paper-block__list-text" v-for="(items,i) in item.data">{{items.question}}</view>
+				</view>
 				<view class="paper-block__date">{{item.createDate}}</view>
 			</view>
 		</view>
@@ -13,8 +15,8 @@
 		</view>
 		<n-empty v-if="list.length==0&&page==1&&nodata">
 			<view slot="text" class="empty-text">
-				<text>暂无创建的试卷，</text>
-				<text class="link" @click="navigateTo('/pages/topic/create')">点击去创建</text>
+				<text>暂无模拟面试记录</text>
+				<text class="link" @click="navigateTo('/pages/modules/simulation/index')">点击去模拟面试</text>
 			</view>
 		</n-empty>
 	</view>
@@ -57,7 +59,7 @@
 					page: this.page,
 					limit: 15,
 				}
-				this.$http.request('get/myCreateExam', params).then(res => {
+				this.$http.request('get/simulationRecord', params).then(res => {
 					uni.hideLoading()
 					this.loading = false
 					let list = res.data
@@ -136,6 +138,7 @@
 
 
 			&__title {
+				width: 90%;
 				font-size: 32rpx;
 				margin-bottom: 20rpx;
 				text-overflow: ellipsis;
@@ -143,9 +146,15 @@
 				white-space: nowrap;
 			}
 
-			&__qrcode {
+			&__list {
 				width: 100%;
-				border-radius: 68rpx;
+				height: 350rpx;
+				overflow: hidden;
+
+				&-text {
+					font-size: 20upx;
+					margin-bottom: 16rpx;
+				}
 			}
 
 			&__date {

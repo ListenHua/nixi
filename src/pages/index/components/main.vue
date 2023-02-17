@@ -60,15 +60,9 @@
 				topicData: {},
 			}
 		},
-		watch: {
-			menuShow(result) {
-				this.checkPage()
-			},
-		},
 		mounted() {
 			this.getTopicList()
 			this.getBookList()
-			this.checkPage()
 		},
 		methods: {
 			// 显示答案

@@ -12,8 +12,9 @@
 			</view>
 		</view>
 		<view class="cell-group">
-			<u-cell title="创建的考卷" @click="navigateTo('/pages/mine/my-create-exam')"></u-cell>
-			<u-cell title="收到的考卷" :border="false" @click="navigateTo('/pages/mine/exam-reply')"></u-cell>
+			<u-cell title="创建的试卷" @click="navigateTo('/pages/mine/my-create-exam')"></u-cell>
+			<u-cell title="收到的试卷" @click="navigateTo('/pages/mine/exam-reply')"></u-cell>
+			<u-cell title="模拟面试记录" :border="false" @click="navigateTo('/pages/mine/my-simulation')"></u-cell>
 			<!-- <u-cell title="系统通知" :border="false" @click="navigateTo()"></u-cell> -->
 		</view>
 		<view class="cell-group">

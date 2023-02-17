@@ -1,13 +1,13 @@
 <template>
 	<scroll-view scroll-y :class="['view-content',className]"
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}"
-		@scrolltolower="loadingData">
+		@scrolltolower="loadingData" @scroll="scrollPage">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
-		<view class="filter-bar" :style="{'padding-top':systemInfo.statusBarHeight+'px'}">
+		<!-- <view class="filter-bar" :style="{'padding-top':systemInfo.statusBarHeight+'px'}">
 			<view class="filter-bar__icon" @click="filterShow=true">
 				<image src="/static/images/filter-icon.svg"></image>
 			</view>
-		</view>
+		</view> -->
 		<view class="interview-list">
 			<view class="interview-list__block" :class="item.className" v-for="(item,index) in interviewList"
 				:key="index">
@@ -17,24 +17,41 @@
 		<!-- 加载数据提示 -->
 		<n-loading-bottom v-if="!nodata" :show="loading"></n-loading-bottom>
 		<!-- 创建面试题按钮 -->
-		<image class="add-btn" src="/static/images/add-icon.svg" mode="aspectFill" @click="createTopic"></image>
+		<view class="float-box">
+			<view class="float-btn" :class="[floatShow?'slide-in-fwd-center':'slide-out-bck-center']">
+				<image class="float-icon" src="/static/images/add-icon.svg" mode="aspectFill" @click="createTopic">
+				</image>
+			</view>
+			<view class="float-btn" :class="[floatShow?'slide-in-fwd-center':'slide-out-bck-center']">
+				<image class="float-icon" src="/static/images/filter-icon.svg" mode="aspectFill"
+					@click="filterShow=true">
+				</image>
+			</view>
+		</view>
 		<!-- 到底提示 -->
 		<u-divider v-if="nodata" text="已经到底了" :customStyle="{padding:'40rpx 60rpx'}"></u-divider>
 		<!-- 提示弹窗 -->
 		<u-toast ref="uToast" />
 		<!-- 筛选弹窗 -->
-		<u-popup :show="filterShow" @close="closeFilter" mode="top">
-			<scroll-view scroll-y style="height: 400rpx;" :style="{'padding-top':systemInfo.statusBarHeight+44+'px'}">
-				<view class="filter-pop">
+		<u-popup :show="filterShow" @close="closeFilter" round="16" mode="bottom">
+			<view class="filter">
+				<view class="filter-top">筛选</view>
+				<view class="filter-title">等级</view>
+				<view class="filter-list">
 					<view class="filter-level" :class="item.check?'filter-level--active':''"
 						v-for="(item,index) in levelOption" @click="selectLevel(index)">{{item.name}}</view>
+				</view>
+				<view class="filter-title">类型</view>
+				<view class="filter-list">
 					<view class="filter-label" :class="item.check?'filter-label--active':''"
 						v-for="(item,index) in labelList" @click="selectLabel(index)">{{item.name}}</view>
 				</view>
-			</scroll-view>
+			</view>
 			<view class="filter-button">
-				<view class="filter-label filter-label--active" @click="toReset">重置</view>
-				<view class="filter-level filter-level--active" @click="toFilter">确定</view>
+				<u-button text="重置" color="#7bcfa6" shape="circle" :customStyle="{margin:'10rpx'}" @click="toReset">
+				</u-button>
+				<u-button text="确定" color="#3478F5" shape="circle" :customStyle="{margin:'10rpx'}" @click="toFilter">
+				</u-button>
 			</view>
 		</u-popup>
 	</scroll-view>
@@ -72,18 +89,32 @@
 				nodata: false,
 				loading: false,
 				filterShow: false,
+
+				scrollValue: 0,
+				floatShow: true,
 			}
 		},
 		watch: {
-			menuShow(result) {
-				if (this.page.main == 'interview' && this.interviewList.length == 0) {
+			page(newVal) {
+				if (newVal.main == 'interview' && this.interviewList.length == 0) {
 					this.getData()
 					this.getLabel()
 				}
-				this.checkPage()
 			},
 		},
 		methods: {
+			// 监控滚动
+			scrollPage(e) {
+				let scroll = e.detail.scrollTop
+				console.log(e.detail.scrollTop, scroll < this.scrollValue);
+				if (scroll > this.scrollValue + 200) {
+					this.scrollValue = scroll
+					this.floatShow = false
+				} else if (scroll < this.scrollValue - 200) {
+					this.scrollValue = scroll
+					this.floatShow = true
+				}
+			},
 			// 生成面试题
 			createTopic() {
 				uni.navigateTo({
@@ -183,6 +214,9 @@
 			},
 			// 获取数据
 			getData() {
+				uni.showLoading({
+					title: "数据加载中..."
+				})
 				let params = {
 					page: this.pages,
 					limit: 15,
@@ -190,6 +224,7 @@
 					label: this.labelValue
 				}
 				this.$http.request('get/getTopicList', params).then(res => {
+					uni.hideLoading()
 					this.loading = false
 					let list = res.data
 					list.forEach((item, index) => {
@@ -223,63 +258,150 @@
 <style scoped lang="scss">
 	@import url('../css/main.css');
 
-	.add-btn {
-		width: 60rpx;
-		height: 60rpx;
-		position: fixed;
-		right: 20rpx;
-		bottom: 30rpx;
+	.slide-in-fwd-center {
+		-webkit-animation: scale-in-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+		animation: scale-in-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 	}
 
-	.filter-pop {
+	.slide-out-bck-center {
+		-webkit-animation: slide-out-bck-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+		animation: slide-out-bck-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+	}
+
+	.float {
+		&-box {
+			position: fixed;
+			right: 30rpx;
+			bottom: 60rpx;
+			display: flex;
+			align-items: flex-end;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		&-btn {
+			width: 68rpx;
+			height: 68rpx;
+			margin-top: 40rpx;
+			background-color: $color-main;
+			border-radius: 50%;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+		}
+
+		&-icon {
+			width: 36rpx;
+			height: 36rpx;
+		}
+	}
+
+	.filter {
 		position: relative;
-		display: flex;
-		flex-wrap: wrap;
 		padding: 0 40rpx;
+		max-height: 60vh;
+		overflow-y: scroll;
 
-	}
+		&-top {
+			font-size: 32rpx;
+			font-weight: bold;
+			color: #000;
+			text-align: center;
+			padding: 30rpx 0;
+			position: sticky;
+			top: 0;
+			background-color: #fff;
+		}
 
-	.filter-level {
-		padding: 0 20rpx;
-		height: 50rpx;
-		text-align: center;
-		line-height: 50rpx;
-		border-radius: 8rpx;
-		border: 2rpx solid $color-shallow;
-		color: $color-shallow;
-		font-size: 26rpx;
-		margin: 0 20rpx 20rpx 0;
-	}
+		&-title {
+			font-size: 28rpx;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 16rpx
+		}
 
-	.filter-level--active {
-		background-color: $color-shallow;
-		border: 2rpx solid transparent;
-		color: #fff;
-	}
+		&-list {
+			display: flex;
+			flex-wrap: wrap;
+			margin-bottom: 20rpx;
+		}
 
-	.filter-label {
-		padding: 0 20rpx;
-		height: 50rpx;
-		text-align: center;
-		line-height: 50rpx;
-		border-radius: 8rpx;
-		border: 2rpx solid $color-main;
-		color: $color-main;
-		font-size: 26rpx;
-		margin: 0 20rpx 20rpx 0;
-	}
+		&-level {
+			padding: 0 20rpx;
+			height: 50rpx;
+			text-align: center;
+			line-height: 50rpx;
+			border-radius: 8rpx;
+			border: 2rpx solid $color-shallow;
+			color: $color-shallow;
+			font-size: 26rpx;
+			margin: 0 20rpx 20rpx 0;
 
-	.filter-label--active {
-		background-color: $color-main;
-		border: 2rpx solid transparent;
-		color: #fff;
-	}
+			&--active {
+				background-color: $color-shallow;
+				border: 2rpx solid transparent;
+				color: #fff;
+			}
+		}
 
-	.filter-button {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		padding: 20rpx 60rpx;
+		&-label {
+			padding: 0 20rpx;
+			min-height: 50rpx;
+			word-break: break-all;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border-radius: 8rpx;
+			border: 2rpx solid $color-main;
+			color: $color-main;
+			font-size: 26rpx;
+			margin: 0 20rpx 20rpx 0;
+
+			&--active {
+				background-color: $color-main;
+				border: 2rpx solid transparent;
+				color: #fff;
+			}
+		}
+
+		&-button {
+			display: flex;
+			align-items: center;
+			padding: 20rpx 30rpx;
+			position: sticky;
+			bottom: 0;
+			background-color: #fff;
+		}
+
+		&-bar {
+			position: fixed;
+			width: 100%;
+			height: 48px;
+			background-color: #fff;
+			top: 0;
+			left: 0;
+			z-index: 99;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&__icon {
+				width: 48rpx;
+				height: 48rpx;
+				border: 4rpx solid #000;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+
+				image {
+					width: 30rpx;
+					height: 30rpx;
+				}
+			}
+		}
 	}
 
 	@for $i from 1 to 16 {
@@ -293,34 +415,6 @@
 
 		&__block {
 			opacity: 0;
-		}
-	}
-
-	.filter-bar {
-		position: fixed;
-		width: 100%;
-		height: 48px;
-		background-color: #fff;
-		top: 0;
-		left: 0;
-		z-index: 99;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		&__icon {
-			width: 48rpx;
-			height: 48rpx;
-			border: 4rpx solid #000;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 50%;
-
-			image {
-				width: 30rpx;
-				height: 30rpx;
-			}
 		}
 	}
 </style>

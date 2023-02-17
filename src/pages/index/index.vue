@@ -6,7 +6,7 @@
 		</view>
 		<view class="page-content"
 			:style="{'height':systemInfo.screenHeight+'px','background-image':userInfo.background?'url('+userInfo.background+')':''}">
-			<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="menuShow=!menuShow"
+			<view :class="['menu-btn',menuShow?'':'no-shadow']" @click="changeMenuShow"
 				:style="{'top':systemInfo.statusBarHeight+6+'px'}">
 				<view :class="['line',menuShow?'show':'']"></view>
 				<view :class="['line',menuShow?'show':'']"></view>
@@ -17,10 +17,10 @@
 					@click="switchFuc(item.value)">{{item.title}}
 				</view>
 			</view>
-			<record-view ref="record" :menuShow="menuShow" :page="pageParams" @switch="switchPage"></record-view>
-			<database-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></database-view>
-			<interview-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></interview-view>
-			<main-view :menuShow="menuShow" :page="pageParams" @switch="switchPage"></main-view>
+			<record-view ref="record" @switch="switchPage"></record-view>
+			<database-view @switch="switchPage"></database-view>
+			<interview-view @switch="switchPage"></interview-view>
+			<main-view @switch="switchPage"></main-view>
 		</view>
 	</view>
 </template>
@@ -31,7 +31,8 @@
 	import InterviewView from './components/interview.vue'
 	import MainView from './components/main.vue'
 	import {
-		mapState
+		mapState,
+		mapMutations
 	} from 'vuex'
 	export default {
 		components: {
@@ -79,12 +80,6 @@
 				pageParams: state => state.home.page
 			})
 		},
-		created() {
-			this.pageParams = {
-				main: 'main',
-				minor: ''
-			}
-		},
 		onShow() {
 			const updateManager = uni.getUpdateManager()
 			// 请求完新版本信息的回调
@@ -115,6 +110,7 @@
 			this.getStartPage()
 		},
 		methods: {
+			...mapMutations(['changeMenuShow', 'checkPage']),
 			// 点击启动页
 			startClick() {
 				let path = this.startParams.path
@@ -145,9 +141,9 @@
 						main: page,
 						minor: params.main
 					}
-					this.pageParams = obj
+					this.checkPage(obj)
 				}
-				this.menuShow = false
+				this.changeMenuShow()
 				console.log("params", this.pageParams)
 			},
 			// 菜单栏操作
@@ -158,11 +154,11 @@
 						this.switchPage(val)
 						break;
 					case 'simulation':
-						this.menuShow = false
+						this.changeMenuShow()
 						this.navigateTo('/pages/modules/simulation/index')
 						break;
 					case 'mine':
-						this.menuShow = false
+						this.changeMenuShow()
 						this.navigateTo('/pages/mine/user-center')
 						break;
 					default:

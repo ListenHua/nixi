@@ -39,7 +39,6 @@
 			this.read_progress = scroll / height
 			clearTimeout(timer)
 
-			// let viewScroll = this.systemInfo.screenHeight / 2 + this.pageScroll
 			let index = this.bookContent.findIndex(item => {
 				if (scroll >= item.element.top && scroll < item.element.bottom) {
 					return item
@@ -60,7 +59,7 @@
 			if (option.type == 'history') {
 				this.getHistoryView()
 			} else if (option.type == 'share') {
-				this.historyValue = option.value
+				this.contentIndex = option.value
 				this.getData()
 			} else {
 				this.getData()
@@ -72,12 +71,11 @@
 		onShareAppMessage() {
 			let info = this.bookInfo
 			let value = this.contentIndex
+			let title = `${info.title}—${this.bookContent[this.contentIndex].title}`
 			return {
-				title: info.title,
+				title,
 				path: `pages/detail/viewDetail?id=${info._id}&type=share&value=${value}`,
 				imageUrl: info.cover,
-				desc: '',
-				content: '',
 			}
 		},
 		methods: {
@@ -263,6 +261,7 @@
 					top: 0;
 					z-index: 9;
 					z-index: 1;
+					border-bottom: 2rpx solid transparent;
 				}
 
 				.content {

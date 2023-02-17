@@ -22,24 +22,19 @@
 	import mixin from './mixins.js'
 	export default {
 		name: "database",
-		mixins:[mixin],
+		mixins: [mixin],
 		data() {
 			return {
-				recommendList:[],
+				recommendList: [],
 				scrollTop: 0,
 			}
 		},
 		watch: {
-			menuShow(result) {
-				if (this.page.main == 'database'&&this.recommendList.length==0) {
+			page(newVal) {
+				if (newVal.main == 'database' && this.recommendList.length == 0) {
 					this.getList()
 				}
-				this.checkPage()
 			},
-		},
-		mounted() {
-			console.log("加载database")
-			this.checkPage()
 		},
 		methods: {
 			pageScroll(e) {

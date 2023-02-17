@@ -20,7 +20,7 @@
 		<view style="padding: 0 50rpx;">
 			<u-divider v-if="nodata&&page!=1" text="这是一条底线"></u-divider>
 		</view>
-		<n-empty v-if="list.length==0&&page==1&&nodata" text="暂无答卷"></n-empty>
+		<n-empty v-if="list.length==0&&page==1&&nodata" text="暂无试卷"></n-empty>
 	</view>
 
 </template>
@@ -56,7 +56,7 @@
 			uni.vibrateShort()
 		},
 		methods: {
-			// 获取提交的考卷
+			// 获取提交的试卷
 			getReply() {
 				this.loading = true
 				uni.showLoading({

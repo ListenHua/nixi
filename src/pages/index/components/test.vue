@@ -3,7 +3,7 @@
 		:style="{'height':systemInfo.screenHeight+'px','padding-top':systemInfo.statusBarHeight+60+'px','z-index':zIndex}">
 		<view v-if="menuShow" class="blur-layer" @touchmove.stop @click="switchInPage"></view>
 		<!-- <view class="cell-group">
-			<u-cell title="提交的考卷" :border="false" @click="viewMyReply"></u-cell>
+			<u-cell title="提交的试卷" :border="false" @click="viewMyReply"></u-cell>
 		</view> -->
 		<u-empty mode="data" text="暂无新功能可以体验" icon="http://cdn.uviewui.com/uview/empty/data.png">
 		</u-empty>
@@ -26,14 +26,9 @@
 
 			}
 		},
-		watch: {
-			menuShow(result) {
-				this.checkPage()
-			},
-		},
 		mounted() {
 			console.log("加载test")
-			this.checkPage()
+			// this.checkPage()
 		},
 		methods: {
 			viewMyReply() {

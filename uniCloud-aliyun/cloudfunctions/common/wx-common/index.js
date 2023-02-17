@@ -46,7 +46,9 @@ function verifyInfo(token) {
 			msg: "请先授权登录用户"
 		}
 	}
-	return userInfo.userInfo
+	let info = userInfo.userInfo
+	delete info.token
+	return info
 }
 
 module.exports = {

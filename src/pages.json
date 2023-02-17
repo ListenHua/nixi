@@ -125,6 +125,24 @@
             }
             
         }
+        ,{
+            "path" : "pages/mine/my-simulation",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/modules/simulation/record-detail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"subPackages": [],
 	"globalStyle": {

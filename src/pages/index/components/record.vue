@@ -28,15 +28,6 @@
 				recordList: [],
 			}
 		},
-		watch: {
-			menuShow(result) {
-				this.checkPage()
-			},
-		},
-		mounted() {
-			console.log("加载record")
-			this.checkPage()
-		},
 		methods: {
 			refresh() {
 				console.log("刷新浏览记录");

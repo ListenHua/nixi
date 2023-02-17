@@ -25,6 +25,13 @@
 		onLoad() {
 			this.getData()
 		},
+		onShareAppMessage() {
+			return {
+				title: "模拟面试",
+				path: `pages/modules/simulation/index`,
+				imageUrl: 'https://mp-54f1765b-5282-47cf-8405-d6f9ccf838c3.cdn.bspapp.com/cloudstorage/0d0abc30-f7a8-4074-bc72-c01cf9a7de15.png',
+			}
+		},
 		onReachBottom() {
 			if (this.nodata) return
 			this.pages += 1

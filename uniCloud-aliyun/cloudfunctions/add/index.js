@@ -4,40 +4,58 @@ const {
 	verifyInfo
 } = require("wx-common");
 const createTime = new Date().getTime()
+var userInfo;
 exports.main = async (event, context) => {
+	let params = event.params
+	userInfo = verifyInfo(params.token)
+	if (userInfo.code) return userInfo
+	delete params.token
 	switch (event.action) {
 		case 'addBookInfo': {
-			return addBookInfo(event.params)
+			return addBookInfo(params)
 		}
 		case 'addTopic': {
-			return addTopic(event.params)
+			return addTopic(params)
 		}
 		case 'addVersion': {
-			return addVersion(event.params)
+			return addVersion(params)
 		}
 		case 'addLabel': {
-			return addLabel(event.params)
+			return addLabel(params)
 		}
 		case 'createSubject': {
-			return createSubject(event.params)
+			return createSubject(params)
 		}
 		case 'answerResult': {
-			return answerResult(event.params)
+			return answerResult(params)
 		}
 		case 'topicAnalysis': {
-			return topicAnalysis(event.params)
+			return topicAnalysis(params)
+		}
+		case 'simulationRecord': {
+			return simulationRecord(params)
 		}
 		default: {
 			return
 		}
 	}
 };
+// 模拟面试记录
+async function simulationRecord(event) {
+	const collection = db.collection('user-simulation-record')
+	event.creatorId = userInfo._id
+	event.createTime = createTime
+	console.log(event);
+	let res = await collection.add(event)
+	return {
+		code: 200,
+		msg: "提交成功!",
+	}
+}
+
 // 添加题目解析
 async function topicAnalysis(event) {
-	let userInfo = verifyInfo(event.token)
-	if (userInfo.code) return userInfo
 	const collection = db.collection('topic-analysis')
-	delete event.token
 	event.createTime = createTime
 	/* 
 	 * 帖子状态
@@ -59,10 +77,7 @@ async function topicAnalysis(event) {
 }
 
 async function answerResult(event) {
-	let userInfo = verifyInfo(event.token)
-	if (userInfo.code) return userInfo
 	const collection = db.collection('answerHistory')
-	delete event.token
 	event.answererId = userInfo._id
 	event.createTime = createTime
 	let res = await collection.add(event)
@@ -93,8 +108,6 @@ async function createSubject(event) {
 			msg: "请输入试卷标题"
 		}
 	}
-	let userInfo = verifyInfo(event.token)
-	if (userInfo.code) return userInfo
 	const collection = db.collection('testPaper')
 	let res = await collection.add({
 		title,
