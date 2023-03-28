@@ -7,7 +7,6 @@ var userInfo;
 exports.main = async (event, context) => {
 	let params = event.params
 	userInfo = verifyInfo(params.token)
-	if (userInfo.code) return userInfo
 	delete params.token
 	switch (event.action) {
 		case 'systemData': {
@@ -97,6 +96,7 @@ async function simulationRecordDetail(event) {
 
 // 获取模拟面试记录
 async function simulationRecord(event) {
+	if (userInfo.code) return userInfo
 	let cmd = db.command
 	let limit = event.limit ? event.limit : 15
 	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
@@ -133,7 +133,7 @@ async function simulationTopic(event) {
 		key,
 		level: 1
 	}).sample({
-		size: 1
+		size: 10
 	}).end()
 	primary = primary.data
 	// 中级题目
@@ -141,7 +141,7 @@ async function simulationTopic(event) {
 		key,
 		level: 2
 	}).sample({
-		size: 1
+		size: 5
 	}).end()
 	middle_rank = middle_rank.data
 	// 高级题目
@@ -149,7 +149,7 @@ async function simulationTopic(event) {
 		key,
 		level: 3
 	}).sample({
-		size: 1
+		size: 5
 	}).end()
 	senior = senior.data
 
@@ -181,6 +181,7 @@ async function simulationList(event) {
 
 // 获取我创建的考卷
 async function myCreateExam(event) {
+	if (userInfo.code) return userInfo
 	let cmd = db.command
 	let limit = event.limit ? event.limit : 15
 	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
@@ -207,6 +208,7 @@ async function myCreateExam(event) {
 
 // 获取考卷详情
 async function getReplyDetail(event) {
+	if (userInfo.code) return userInfo
 	let {
 		id
 	} = event
@@ -229,6 +231,7 @@ async function getReplyDetail(event) {
 
 // 获取收到的考卷
 async function getExamReply(event) {
+	if (userInfo.code) return userInfo
 	let cmd = db.command
 	let limit = event.limit ? event.limit : 15
 	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
@@ -277,7 +280,7 @@ async function topicAnalysis(event) {
 	let limit = event.limit ? event.limit : 15
 	let page = event.page ? event.page - 1 < 0 ? 0 : event.page - 1 : 0
 	let key = {
-		id: cmd.eq(event.id),
+		topicId: cmd.eq(event.id),
 		status: cmd.eq(1)
 	}
 	let start = page * limit
