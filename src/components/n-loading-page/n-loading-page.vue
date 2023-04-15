@@ -16,7 +16,7 @@
 		props: {
 			image: {
 				type: String,
-				default: 'http://43.138.147.182/images/loading.gif',
+				default: 'http://admin.nixi-studio.com/images/loading.gif',
 			}
 		},
 		name: "loading-page",

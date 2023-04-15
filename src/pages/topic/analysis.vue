@@ -5,6 +5,10 @@
 		</view>
 		<view class="analysis-box">
 			<view class="analysis-title">题目解析</view>
+			<n-html v-if="topicInfo.analysis" :content="topicInfo.analysis"></n-html>
+			<u-empty v-else text="该题暂未添加解析" mode="data" icon="http://cdn.uviewui.com/uview/empty/data.png">
+			</u-empty>
+			<view class="analysis-title">其他解析</view>
 			<view class="analysis-list">
 				<view class="analysis-block" :class="[item.className]" v-for="item in analysisList">
 					<view class="user-info" v-if="item.author">
@@ -16,7 +20,7 @@
 					</view>
 					<view class="analysis-block__content">{{item.content}}</view>
 				</view>
-				<u-empty v-if="analysisList.length==0&&nodata" text="该题暂无解析" mode="data"
+				<u-empty v-if="analysisList.length==0&&nodata" text="该题暂无其他解析" mode="data"
 					icon="http://cdn.uviewui.com/uview/empty/data.png">
 				</u-empty>
 			</view>
@@ -197,6 +201,7 @@
 			font-size: 32rpx;
 			position: relative;
 			padding-left: 30rpx;
+			margin: 30rpx 0;
 
 			&::after {
 				content: "";
